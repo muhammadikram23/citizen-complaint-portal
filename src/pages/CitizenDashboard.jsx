@@ -17,6 +17,7 @@ export const CitizenDashboard = () => {
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [feedbackTarget, setFeedbackTarget] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
   const [dailyQuota, setDailyQuota] = useState({ limit: 5, usedToday: 0, remaining: 5 });
 
   const fetchMyComplaints = async () => {

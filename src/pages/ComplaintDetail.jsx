@@ -41,6 +41,8 @@ export const ComplaintDetail = () => {
   };
 
   useEffect(() => {
+    setLoading(true);
+    setError('');
     fetchDetail();
   }, [id]);
 

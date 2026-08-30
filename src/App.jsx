@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import { Sidebar } from './components/Sidebar';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import logo from './assets/logo.png';
 
 // Pages
@@ -24,7 +25,8 @@ export function App() {
         <Sidebar>
           <div className="min-h-screen flex flex-col justify-between">
             <div className="flex-1">
-              <Routes>
+              <ErrorBoundary>
+                <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<Home />} />
                 <Route path="/signup" element={<Signup />} />
@@ -79,7 +81,8 @@ export function App() {
                 {/* Catch-all */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
-            </div>
+            </ErrorBoundary>
+          </div>
 
             {/* Institutional Portal Footer */}
             <footer className="border-t border-gray-300 bg-white py-4 px-4 sm:px-6 text-xs text-gray-500 mt-12">
