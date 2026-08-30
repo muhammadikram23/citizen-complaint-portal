@@ -36,6 +36,7 @@
 
 @layer base {
   html {
+    font-family: 'Poppins', sans-serif;
     color-scheme: light;
   }
   html[data-theme="dark"] {
@@ -43,41 +44,46 @@
   }
 
   body {
-    @apply bg-bg text-text font-sans antialiased transition-colors duration-150;
+    font-family: 'Poppins', sans-serif;
+    @apply bg-bg text-text antialiased transition-colors duration-150;
   }
 
   h1 {
-    @apply font-serif text-2xl sm:text-3xl font-bold tracking-tight text-text;
+    font-family: 'Poppins', sans-serif;
+    @apply text-2xl sm:text-3xl font-bold tracking-tight text-text;
   }
 
   h2 {
-    @apply font-serif text-xl sm:text-2xl font-bold tracking-tight text-text;
+    font-family: 'Poppins', sans-serif;
+    @apply text-xl sm:text-2xl font-bold tracking-tight text-text;
   }
 
   h3 {
-    @apply font-sans text-base font-semibold text-text;
+    font-family: 'Poppins', sans-serif;
+    @apply text-base font-semibold text-text;
   }
 
   p {
-    @apply font-sans text-sm leading-relaxed text-muted max-w-[80ch];
+    font-family: 'Poppins', sans-serif;
+    @apply text-sm leading-relaxed text-muted max-w-[80ch];
   }
 }
 
 @layer components {
   /* Institutional functional UI components */
   .btn-primary {
-    @apply inline-flex min-h-[44px] items-center justify-center rounded border border-transparent bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 active:bg-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors;
+    @apply inline-flex min-h-[44px] items-center justify-center rounded border border-transparent bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 active:bg-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-sans;
   }
 
   .btn-secondary {
-    @apply inline-flex min-h-[44px] items-center justify-center rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 active:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500 disabled:opacity-50 transition-colors;
+    @apply inline-flex min-h-[44px] items-center justify-center rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 active:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500 disabled:opacity-50 transition-colors font-sans;
   }
 
   .input-field {
-    @apply w-full min-h-[44px] rounded border border-gray-300 bg-white px-3.5 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 disabled:bg-gray-100 disabled:text-gray-500 transition-colors;
+    @apply w-full min-h-[44px] rounded border border-gray-300 bg-white px-3.5 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 disabled:bg-gray-100 disabled:text-gray-500 transition-colors font-sans;
   }
 
   .label-text {
-    @apply block text-xs font-semibold text-muted mb-1.5;
+    @apply block text-xs font-semibold text-muted mb-1.5 font-sans;
   }
 }

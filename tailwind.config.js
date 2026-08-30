@@ -7,8 +7,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Public Sans"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
-        serif: ['"Source Serif 4"', 'Georgia', 'Cambria', 'serif'],
+        sans: ['"Poppins"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+        serif: ['"Poppins"', '-apple-system', 'sans-serif'],
+        poppins: ['"Poppins"', 'sans-serif'],
       },
       colors: {
         bg: 'rgb(var(--color-bg) / <alpha-value>)',
