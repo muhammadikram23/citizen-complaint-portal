@@ -36,7 +36,7 @@ export const Sidebar = ({ children }) => {
     const base =
       'flex items-center gap-3 px-3 py-2.5 rounded text-xs sm:text-sm transition-colors min-h-[42px] font-sans';
     if (isActive) {
-      return `${base} bg-slate-900 text-white font-medium shadow-xs`;
+      return `${base} bg-emerald-600 text-white font-medium shadow-xs`;
     }
     return `${base} text-slate-700 hover:bg-slate-200/70 hover:text-slate-950 font-normal`;
   };

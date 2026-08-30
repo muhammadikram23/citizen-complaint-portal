@@ -188,7 +188,7 @@ export const BrowseComplaints = () => {
               onClick={() => setPriority(p)}
               className={`px-2.5 py-1 rounded text-xs transition-colors ${
                 priority === p
-                  ? 'bg-slate-900 text-white font-semibold'
+                  ? 'bg-emerald-600 text-white font-semibold shadow-xs'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
@@ -287,7 +287,7 @@ export const BrowseComplaints = () => {
                       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium min-h-[34px] transition-colors border ${
                         hasUserUpvoted
                           ? 'bg-blue-50 text-blue-900 border-blue-200 cursor-default'
-                          : 'bg-slate-100 text-slate-800 hover:bg-slate-900 hover:text-white border-slate-300'
+                          : 'bg-slate-100 text-slate-800 hover:bg-emerald-600 hover:text-white hover:border-emerald-600 border-slate-300'
                       }`}
                       title={hasUserUpvoted ? 'You have already upvoted this complaint' : 'Upvote complaint'}
                     >

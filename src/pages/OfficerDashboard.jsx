@@ -327,7 +327,7 @@ export const OfficerDashboard = () => {
                 onClick={() => setPriority(p)}
                 className={`px-2.5 py-0.5 rounded text-xs transition-colors ${
                   priority === p
-                    ? 'bg-slate-900 text-white font-semibold'
+                    ? 'bg-emerald-600 text-white font-semibold shadow-xs'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
