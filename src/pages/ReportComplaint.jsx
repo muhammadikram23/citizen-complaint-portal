@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axios';
 import logo from '../assets/logo.png';
 import { DuplicateWarning } from '../components/DuplicateWarning';
-import { AlertCircle, CheckCircle2, ArrowLeft, Send, Upload, X } from 'lucide-react';
+import { AlertCircle, CheckCircle2, ArrowLeft, Send, Upload, X, ShieldAlert } from 'lucide-react';
 
 const CATEGORIES = ['Road', 'Garbage', 'Water', 'Electricity', 'Other'];
 
@@ -26,6 +26,26 @@ export const ReportComplaint = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [dailyQuota, setDailyQuota] = useState({ limit: 5, usedToday: 0, remaining: 5 });
+
+  const fetchDailyQuota = async () => {
+    try {
+      const res = await api.get('/complaints/daily-quota');
+      if (res.data) {
+        setDailyQuota({
+          limit: res.data.limit || 5,
+          usedToday: res.data.usedToday || 0,
+          remaining: res.data.remaining !== undefined ? res.data.remaining : 5,
+        });
+      }
+    } catch (err) {
+      console.warn('Daily quota lookup warning:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchDailyQuota();
+  }, []);
 
   // Duplicate Check effect: Checks title, description, category, and area
   useEffect(() => {
@@ -175,6 +195,58 @@ export const ReportComplaint = () => {
         </div>
       )}
 
+      {/* Daily Submission Limit / Quota Banner */}
+      <div
+        className={`p-4 rounded border text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+          dailyQuota.remaining === 0
+            ? 'bg-red-50 border-red-300 text-red-950'
+            : dailyQuota.remaining === 1
+            ? 'bg-amber-50 border-amber-300 text-amber-950'
+            : 'bg-blue-50 border-blue-200 text-blue-950'
+        }`}
+      >
+        <div className="flex items-center gap-2.5">
+          <ShieldAlert
+            className={`h-4 w-4 shrink-0 ${
+              dailyQuota.remaining === 0
+                ? 'text-red-700'
+                : dailyQuota.remaining === 1
+                ? 'text-amber-700'
+                : 'text-blue-700'
+            }`}
+            strokeWidth={1.75}
+          />
+          <div>
+            <span className="font-semibold">Daily Submission Quota: </span>
+            <span>
+              {dailyQuota.remaining > 0 ? (
+                <>
+                  You have{' '}
+                  <strong className="font-bold">
+                    {dailyQuota.remaining} of {dailyQuota.limit}
+                  </strong>{' '}
+                  complaint submissions remaining for today.
+                </>
+              ) : (
+                <strong className="font-bold">
+                  Daily limit of {dailyQuota.limit} reports reached. Please try again tomorrow.
+                </strong>
+              )}
+            </span>
+          </div>
+        </div>
+
+        <span
+          className={`font-semibold px-2.5 py-1 rounded text-xs border shrink-0 text-center ${
+            dailyQuota.remaining === 0
+              ? 'bg-red-100 text-red-900 border-red-300'
+              : 'bg-white text-slate-800 border-slate-300'
+          }`}
+        >
+          {dailyQuota.remaining} / {dailyQuota.limit} remaining
+        </span>
+      </div>
+
       {/* Duplicate Detection Warning */}
       {!duplicateCheckDismissed && duplicates.length > 0 && (
         <DuplicateWarning
@@ -307,11 +379,15 @@ export const ReportComplaint = () => {
           </Link>
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || dailyQuota.remaining === 0}
             className="btn-primary text-xs inline-flex items-center gap-2"
           >
             <Send className="h-3.5 w-3.5" strokeWidth={1.75} />
-            {loading ? 'Submitting complaint...' : 'Submit complaint'}
+            {loading
+              ? 'Submitting complaint...'
+              : dailyQuota.remaining === 0
+              ? 'Daily quota limit reached'
+              : 'Submit complaint'}
           </button>
         </div>
       </form>

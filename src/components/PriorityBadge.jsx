@@ -27,14 +27,8 @@ export const PriorityBadge = ({ priority, score }) => {
   return (
     <span
       className={`inline-flex items-center px-2 py-0.5 rounded text-xs border font-sans ${current.classes}`}
-      title={score !== undefined ? `Calculated score: ${score}` : undefined}
     >
       <span>{current.label}</span>
-      {score !== undefined && (
-        <span className="text-[11px] opacity-75 font-normal ml-1">
-          ({score})
-        </span>
-      )}
     </span>
   );
 };

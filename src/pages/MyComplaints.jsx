@@ -5,7 +5,7 @@ import logo from '../assets/logo.png';
 import { PriorityBadge } from '../components/PriorityBadge';
 import { StatusBadge } from '../components/StatusBadge';
 import { FeedbackModal } from '../components/FeedbackModal';
-import { PlusCircle, Star, MessageSquare, CheckCircle2, Search } from 'lucide-react';
+import { PlusCircle, Star, MessageSquare, CheckCircle2, Search, Clock } from 'lucide-react';
 
 export const MyComplaints = () => {
   const [complaints, setComplaints] = useState([]);
@@ -261,6 +261,22 @@ export const MyComplaints = () => {
                   </span>
                 </div>
               )}
+
+              {/* Status History & Audit Summary Row */}
+              <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+                <span className="flex items-center gap-1.5">
+                  <Clock className="h-3.5 w-3.5 text-slate-400" strokeWidth={1.75} />
+                  <span>
+                    <strong>{c.statusHistory?.length || 1}</strong> status event{c.statusHistory?.length === 1 ? '' : 's'} in audit history
+                  </span>
+                </span>
+                <Link
+                  to={`/complaints/${c._id}`}
+                  className="font-semibold text-slate-900 hover:underline"
+                >
+                  View full timeline &rarr;
+                </Link>
+              </div>
             </div>
           ))}
         </div>

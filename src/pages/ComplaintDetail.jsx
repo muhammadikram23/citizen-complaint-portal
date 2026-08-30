@@ -205,16 +205,6 @@ export const ComplaintDetail = () => {
           </div>
         )}
 
-        {/* Priority Formula Assessment */}
-        <div className="bg-slate-50 border border-slate-200 rounded p-4 text-xs space-y-1">
-          <div className="font-semibold text-slate-900">
-            Priority calculation: {complaint.priority} ({complaint.priorityScore} points)
-          </div>
-          <p className="text-slate-600 text-xs leading-relaxed">
-            Formula: Score = (upvotes &times; 2) + days open &rarr; ({complaint.upvotes} &times; 2) + {complaint.daysSinceCreated || 0} = <strong className="text-slate-900">{complaint.priorityScore}</strong> points.
-          </p>
-        </div>
-
         {/* Officer Response Section */}
         <div className="space-y-3 pt-4 border-t border-slate-200">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500">

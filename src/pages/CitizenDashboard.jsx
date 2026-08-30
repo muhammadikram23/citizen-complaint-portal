@@ -17,7 +17,7 @@ export const CitizenDashboard = () => {
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [feedbackTarget, setFeedbackTarget] = useState(null);
-  const [successMessage, setSuccessMessage] = useState('');
+  const [dailyQuota, setDailyQuota] = useState({ limit: 5, usedToday: 0, remaining: 5 });
 
   const fetchMyComplaints = async () => {
     try {
@@ -30,8 +30,24 @@ export const CitizenDashboard = () => {
     }
   };
 
+  const fetchDailyQuota = async () => {
+    try {
+      const res = await api.get('/complaints/daily-quota');
+      if (res.data) {
+        setDailyQuota({
+          limit: res.data.limit || 5,
+          usedToday: res.data.usedToday || 0,
+          remaining: res.data.remaining !== undefined ? res.data.remaining : 5,
+        });
+      }
+    } catch (err) {
+      console.warn('Daily quota lookup warning:', err);
+    }
+  };
+
   useEffect(() => {
     fetchMyComplaints();
+    fetchDailyQuota();
   }, []);
 
   const handleFeedbackSubmit = async (complaintId, rating, comment) => {
@@ -102,8 +118,8 @@ export const CitizenDashboard = () => {
         </div>
       )}
 
-      {/* Overview Stat Counters */}
-      <div className="grid grid-cols-3 gap-3 sm:gap-4">
+      {/* Overview Stat Counters (including remaining daily quota) */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         <div className="bg-white border border-slate-300 rounded p-4">
           <div className="text-xs text-slate-500 font-medium">Pending review</div>
           <div className="text-2xl font-bold text-slate-950 mt-1">
@@ -122,6 +138,14 @@ export const CitizenDashboard = () => {
           <div className="text-xs text-slate-500 font-medium">Resolved issues</div>
           <div className="text-2xl font-bold text-emerald-900 mt-1">
             {loading ? '-' : resolvedCount}
+          </div>
+        </div>
+
+        <div className="bg-white border border-slate-300 rounded p-4">
+          <div className="text-xs text-slate-500 font-medium">Daily quota left</div>
+          <div className="text-2xl font-bold text-slate-950 mt-1 flex items-baseline gap-1">
+            <span>{loading ? '-' : dailyQuota.remaining}</span>
+            <span className="text-xs font-normal text-slate-500">/ {dailyQuota.limit} today</span>
           </div>
         </div>
       </div>
