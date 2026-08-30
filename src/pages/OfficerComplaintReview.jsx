@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { PriorityBadge } from '../components/PriorityBadge';
 import { StatusBadge } from '../components/StatusBadge';
+import { StatusHistoryTimeline } from '../components/StatusHistoryTimeline';
 import {
   ArrowLeft,
   ShieldCheck,
@@ -269,6 +270,13 @@ export const OfficerComplaintReview = () => {
                 "{complaint.feedbackComment}"
               </p>
             )}
+          </div>
+        )}
+
+        {/* Status History & Audit Trail Timeline */}
+        {complaint.statusHistory && complaint.statusHistory.length > 0 && (
+          <div className="pt-4 border-t border-slate-200">
+            <StatusHistoryTimeline history={complaint.statusHistory} />
           </div>
         )}
       </article>
