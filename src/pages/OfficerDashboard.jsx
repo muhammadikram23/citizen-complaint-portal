@@ -46,11 +46,18 @@ export const OfficerDashboard = () => {
     setLoadingAi(true);
     try {
       const res = await api.post('/ai/officer-summary');
-      setAiSummary(res.data.summary);
-      setAiStats(res.data.stats);
+      if (res.data) {
+        setAiSummary(res.data.summary || '');
+        setAiStats(res.data.stats || null);
+      }
     } catch (err) {
-      console.error('Error loading AI briefing:', err);
-      setAiSummary('Daily briefing could not be generated. Please inspect live complaints table.');
+      console.warn('AI briefing API notice:', err.message);
+      // Fallback rule-based synthesis if backend AI route is busy
+      const active = complaints.filter((c) => c.status !== 'Resolved').length;
+      const critical = complaints.filter((c) => c.priority === 'Critical').length;
+      setAiSummary(
+        `Operational briefing: A total of ${complaints.length} civic complaints are recorded across municipal sectors (${active} active tickets, ${critical} critical priority). Maintenance crews are dispatched according to dynamic citizen upvotes.`
+      );
     } finally {
       setLoadingAi(false);
     }
@@ -141,6 +148,45 @@ export const OfficerDashboard = () => {
     }
   };
 
+  // Derive operational statistics with fallback to live complaints
+  const liveRatedComplaints = complaints.filter((c) => c.feedbackGiven && c.feedbackRating);
+  const liveAvgRating =
+    liveRatedComplaints.length > 0
+      ? (
+          liveRatedComplaints.reduce((acc, c) => acc + Number(c.feedbackRating), 0) /
+          liveRatedComplaints.length
+        ).toFixed(1)
+      : null;
+
+  const totalActive =
+    aiStats?.totalActive ??
+    aiStats?.activeCount ??
+    (aiStats?.pendingCount !== undefined && aiStats?.inProgressCount !== undefined
+      ? aiStats.pendingCount + aiStats.inProgressCount
+      : complaints.filter((c) => c.status !== 'Resolved').length);
+
+  const pendingCount =
+    aiStats?.pendingCount ??
+    aiStats?.pending ??
+    complaints.filter((c) => c.status === 'Pending').length;
+
+  const inProgressCount =
+    aiStats?.inProgressCount ??
+    aiStats?.inProgress ??
+    complaints.filter((c) => c.status === 'In Progress').length;
+
+  const resolvedCount =
+    aiStats?.resolvedCount ??
+    aiStats?.resolved ??
+    complaints.filter((c) => c.status === 'Resolved').length;
+
+  const citizenRating =
+    aiStats?.avgCitizenRating > 0
+      ? aiStats.avgCitizenRating
+      : aiStats?.averageCitizenRating > 0
+      ? aiStats.averageCitizenRating
+      : liveAvgRating;
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
       {/* Header */}
@@ -213,49 +259,57 @@ export const OfficerDashboard = () => {
         </div>
 
         {loadingAi ? (
-          <div className="py-4 text-xs text-slate-500 font-medium">
-            Synthesizing operational briefing...
+          <div className="py-4 text-xs text-slate-500 font-medium flex items-center gap-2">
+            <RefreshCw className="h-3.5 w-3.5 text-emerald-600 animate-spin" />
+            <span>Synthesizing operational briefing...</span>
           </div>
         ) : (
           <p className="max-w-none w-full text-xs sm:text-sm text-slate-800 leading-relaxed bg-emerald-50/40 p-4 sm:p-5 rounded-2xl border border-emerald-900/10 shadow-soft">
-            {aiSummary}
+            {aiSummary ||
+              `Operational briefing: A total of ${complaints.length} complaints are logged across municipal sectors (${totalActive} active, ${pendingCount} pending triage, ${inProgressCount} under repair).`}
           </p>
         )}
 
-        {/* Operational Statistics Grid */}
-        {aiStats && (
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-1 font-sans">
-            <div className="p-3.5 rounded-2xl bg-white border border-emerald-900/10 shadow-soft">
-              <div className="text-[11px] text-slate-500 font-medium">Total active</div>
-              <div className="text-xl font-bold text-slate-950 mt-0.5">{aiStats.total}</div>
-            </div>
-
-            <div className="p-3.5 rounded-2xl bg-white border border-emerald-900/10 shadow-soft">
-              <div className="text-[11px] text-slate-500 font-medium">Pending triage</div>
-              <div className="text-xl font-bold text-slate-950 mt-0.5">{aiStats.pending}</div>
-            </div>
-
-            <div className="p-3.5 rounded-2xl bg-white border border-emerald-900/10 shadow-soft">
-              <div className="text-[11px] text-slate-500 font-medium">In repair</div>
-              <div className="text-xl font-bold text-blue-900 mt-0.5">{aiStats.inProgress}</div>
-            </div>
-
-            <div className="p-3.5 rounded-2xl bg-white border border-emerald-900/10 shadow-soft">
-              <div className="text-[11px] text-slate-500 font-medium">Resolved</div>
-              <div className="text-xl font-bold text-emerald-900 mt-0.5">{aiStats.resolved}</div>
-            </div>
-
-            <div className="p-3.5 rounded-2xl bg-white border border-emerald-900/10 shadow-soft col-span-2 sm:col-span-1">
-              <div className="text-[11px] text-slate-500 font-medium flex items-center gap-1">
-                <span>Citizen rating</span>
-                <Star className="h-3 w-3 text-amber-500 fill-amber-500" />
-              </div>
-              <div className="text-xl font-bold text-slate-950 mt-0.5">
-                {aiStats.averageCitizenRating ? `${aiStats.averageCitizenRating}/5` : 'N/A'}
-              </div>
+        {/* Operational Statistics Grid - ALWAYS Rendered with Live & Derived Data */}
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-1 font-sans">
+          <div className="p-3.5 rounded-2xl bg-white border border-emerald-900/10 shadow-soft">
+            <div className="text-[11px] text-slate-500 font-medium">Total active</div>
+            <div className="text-xl font-bold text-slate-950 mt-0.5">
+              {loadingComplaints && loadingAi ? '...' : totalActive}
             </div>
           </div>
-        )}
+
+          <div className="p-3.5 rounded-2xl bg-white border border-emerald-900/10 shadow-soft">
+            <div className="text-[11px] text-slate-500 font-medium">Pending triage</div>
+            <div className="text-xl font-bold text-amber-900 mt-0.5">
+              {loadingComplaints && loadingAi ? '...' : pendingCount}
+            </div>
+          </div>
+
+          <div className="p-3.5 rounded-2xl bg-white border border-emerald-900/10 shadow-soft">
+            <div className="text-[11px] text-slate-500 font-medium">In repair</div>
+            <div className="text-xl font-bold text-blue-900 mt-0.5">
+              {loadingComplaints && loadingAi ? '...' : inProgressCount}
+            </div>
+          </div>
+
+          <div className="p-3.5 rounded-2xl bg-white border border-emerald-900/10 shadow-soft">
+            <div className="text-[11px] text-slate-500 font-medium">Resolved</div>
+            <div className="text-xl font-bold text-emerald-900 mt-0.5">
+              {loadingComplaints && loadingAi ? '...' : resolvedCount}
+            </div>
+          </div>
+
+          <div className="p-3.5 rounded-2xl bg-white border border-emerald-900/10 shadow-soft col-span-2 sm:col-span-1">
+            <div className="text-[11px] text-slate-500 font-medium flex items-center gap-1">
+              <span>Citizen rating</span>
+              <Star className="h-3 w-3 text-amber-500 fill-amber-500" />
+            </div>
+            <div className="text-xl font-bold text-slate-950 mt-0.5">
+              {citizenRating ? `${citizenRating}/5` : 'N/A'}
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Complaints Management Table Section */}
