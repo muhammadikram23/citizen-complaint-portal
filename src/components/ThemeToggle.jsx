@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Moon, Sun } from 'lucide-react';
 
-export const ThemeToggle = () => {
+export const ThemeToggle = ({ collapsed = false }) => {
   const [theme, setTheme] = useState(() => {
     try {
       return (
@@ -34,6 +34,32 @@ export const ThemeToggle = () => {
 
   const isDark = theme === 'dark';
 
+  // ---- Compact icon-only view when sidebar is collapsed ----
+  // Rendered as a fixed-size square button so it can never overflow
+  // the collapsed w-20 rail, and NO text/label is rendered at all.
+  if (collapsed) {
+    return (
+      <button
+        type="button"
+        onClick={toggleTheme}
+        className={`mx-auto flex items-center justify-center h-9 w-9 rounded-xl border transition-all duration-150 shadow-soft overflow-hidden shrink-0 ${
+          isDark
+            ? 'bg-emerald-950/40 text-amber-300 border-emerald-800/40 hover:bg-emerald-900/40'
+            : 'bg-white text-slate-700 border-emerald-900/10 hover:bg-emerald-50/60'
+        }`}
+        title={isDark ? 'Switch to Light mode' : 'Switch to Dark mode'}
+        aria-label={isDark ? 'Switch to Light mode' : 'Switch to Dark mode'}
+      >
+        {isDark ? (
+          <Sun className="h-4 w-4 text-amber-400 shrink-0" strokeWidth={2} />
+        ) : (
+          <Moon className="h-4 w-4 text-slate-600 shrink-0" strokeWidth={2} />
+        )}
+      </button>
+    );
+  }
+
+  // ---- Full view with label and switch (expanded sidebar / mobile drawer) ----
   return (
     <button
       type="button"

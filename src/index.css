@@ -89,6 +89,7 @@
 [data-theme="dark"] aside,
 [data-theme="dark"] header,
 [data-theme="dark"] footer,
+[data-theme="dark"] main,
 [data-theme="dark"] .bg-white {
   background-color: #16241e !important;
   color: #f1f5f9 !important;

@@ -86,14 +86,14 @@ export function App() {
 
             {/* Institutional Portal Footer */}
             <footer className="border-t border-emerald-900/10 bg-white/90 backdrop-blur-sm py-4 px-4 sm:px-6 text-xs text-slate-500 mt-12 shadow-soft">
-              <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+              <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2">
                 <div className="flex items-center gap-2.5">
                   <img src={logo} alt="Logo" className="h-7 w-auto object-contain shrink-0 opacity-90" />
                   <span className="font-medium text-slate-600">Municipal Citizen Complaint & Operations Management System</span>
                 </div>
-                <div className="text-slate-400 font-medium">
+                {/* <div className="text-slate-400 font-medium">
                   Connected to Live Production API & MongoDB Atlas
-                </div>
+                </div> */}
               </div>
             </footer>
           </div>

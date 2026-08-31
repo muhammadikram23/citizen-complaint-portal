@@ -209,9 +209,9 @@ export const Sidebar = ({ children }) => {
               </div>
             )}
 
-            {/* Dark Mode Toggle directly inside the column */}
+            {/* Dark Mode Toggle — mobile drawer is never collapsed, always full view */}
             <div className="pt-1">
-              <ThemeToggle />
+              <ThemeToggle collapsed={false} />
             </div>
           </div>
         </div>
@@ -219,7 +219,7 @@ export const Sidebar = ({ children }) => {
 
       {/* Desktop Fixed Side Navigation Rail with Rounded Aesthetic */}
       <aside
-        className={`hidden md:flex flex-col shrink-0 bg-white/90 backdrop-blur-sm border-r border-emerald-900/10 min-h-screen transition-[width] duration-200 shadow-soft ${
+        className={`hidden md:flex flex-col shrink-0 bg-white/90 backdrop-blur-sm border-r border-emerald-900/10 min-h-screen transition-[width] duration-200 shadow-soft overflow-hidden ${
           collapsed ? 'w-20' : 'w-64'
         }`}
       >
@@ -244,28 +244,46 @@ export const Sidebar = ({ children }) => {
               </div>
             </div>
           ) : (
-            <div className="mx-auto p-1 rounded-xl bg-emerald-50/80 border border-emerald-200/60" title="Civic Complaint Portal">
-              <img src={logo} alt="Portal Logo" className="h-7 w-auto object-contain shrink-0" />
+            <div
+              className="mx-auto flex items-center justify-center h-9 w-9 rounded-xl bg-emerald-50/80 border border-emerald-200/60 shrink-0 overflow-hidden"
+              title="Civic Complaint Portal"
+            >
+              <img src={logo} alt="Portal Logo" className="h-6 w-6 object-contain shrink-0" />
             </div>
           )}
 
-          <button
-            type="button"
-            onClick={() => setCollapsed(!collapsed)}
-            className="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-emerald-50 transition-colors shrink-0"
-            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            {collapsed ? (
-              <PanelLeftOpen className="h-4 w-4" strokeWidth={1.75} />
-            ) : (
+          {!collapsed && (
+            <button
+              type="button"
+              onClick={() => setCollapsed(!collapsed)}
+              className="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-emerald-50 transition-colors shrink-0"
+              title="Collapse sidebar"
+              aria-label="Collapse sidebar"
+            >
               <PanelLeftClose className="h-4 w-4" strokeWidth={1.75} />
-            )}
-          </button>
+            </button>
+          )}
         </div>
 
+        {/* Collapse toggle gets its own centered row when collapsed, so the
+            brand header above only ever has to fit the logo, not the logo
+            + a second button squeezed into 80px */}
+        {collapsed && (
+          <div className="px-4 pb-2 flex items-center justify-center">
+            <button
+              type="button"
+              onClick={() => setCollapsed(!collapsed)}
+              className="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-emerald-50 transition-colors shrink-0"
+              title="Expand sidebar"
+              aria-label="Expand sidebar"
+            >
+              <PanelLeftOpen className="h-4 w-4" strokeWidth={1.75} />
+            </button>
+          </div>
+        )}
+
         {/* Main Column: Routes + Actions + User Info + Theme Toggle flowing in a single column */}
-        <div className="flex-1 p-3.5 space-y-3.5 overflow-y-auto">
+        <div className="flex-1 p-3.5 space-y-3.5 overflow-y-auto overflow-x-hidden">
           {/* Primary Routes */}
           {!isAuthenticated ? (
             <div className="space-y-1">
@@ -346,8 +364,8 @@ export const Sidebar = ({ children }) => {
 
                 <NavLink
                   to="/login"
-                  className={`w-full min-h-[42px] px-3.5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 shadow-soft transition-colors ${
-                    collapsed ? 'p-2' : ''
+                  className={`min-h-[42px] rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 shadow-soft transition-colors ${
+                    collapsed ? 'w-9 h-9 mx-auto p-0' : 'w-full px-3.5 py-2.5'
                   }`}
                   title="Log in"
                 >
@@ -357,8 +375,8 @@ export const Sidebar = ({ children }) => {
 
                 <NavLink
                   to="/signup"
-                  className={`w-full min-h-[42px] px-3.5 py-2.5 rounded-xl bg-white hover:bg-emerald-50 active:bg-emerald-100 text-emerald-800 border border-emerald-600/60 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-colors shadow-soft ${
-                    collapsed ? 'p-2' : ''
+                  className={`min-h-[42px] rounded-xl bg-white hover:bg-emerald-50 active:bg-emerald-100 text-emerald-800 border border-emerald-600/60 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-colors shadow-soft ${
+                    collapsed ? 'w-9 h-9 mx-auto p-0' : 'w-full px-3.5 py-2.5'
                   }`}
                   title="Sign up"
                 >
@@ -385,7 +403,10 @@ export const Sidebar = ({ children }) => {
                     </span>
                   </div>
                 ) : (
-                  <div className="flex justify-center p-2 rounded-xl bg-emerald-50/40 border border-emerald-900/10" title={`${user?.name} (${user?.role})`}>
+                  <div
+                    className="mx-auto flex items-center justify-center h-9 w-9 rounded-xl bg-emerald-50/40 border border-emerald-900/10"
+                    title={`${user?.name} (${user?.role})`}
+                  >
                     <User className="h-4 w-4 text-slate-600" strokeWidth={1.75} />
                   </div>
                 )}
@@ -404,7 +425,7 @@ export const Sidebar = ({ children }) => {
                     <button
                       type="button"
                       onClick={handleSignOut}
-                      className="p-2 text-red-700 hover:bg-red-50 rounded-xl"
+                      className="h-9 w-9 flex items-center justify-center text-red-700 hover:bg-red-50 rounded-xl"
                       title="Sign out"
                     >
                       <LogOut className="h-4 w-4" strokeWidth={1.75} />
@@ -414,9 +435,9 @@ export const Sidebar = ({ children }) => {
               </div>
             )}
 
-            {/* Dark Mode Toggle directly inside the column */}
-            <div className="pt-1">
-              <ThemeToggle />
+            {/* Dark Mode Toggle — icon-only, no label, no switch when rail is collapsed */}
+            <div className="pt-1 flex justify-center">
+              <ThemeToggle collapsed={collapsed} />
             </div>
           </div>
         </div>
