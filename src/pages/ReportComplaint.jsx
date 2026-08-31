@@ -1,14 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axios';
 import logo from '../assets/logo.png';
 import { DuplicateWarning } from '../components/DuplicateWarning';
-import { AlertCircle, CheckCircle2, ArrowLeft, Send, Upload, X, ShieldAlert } from 'lucide-react';
+import { compressImage } from '../utils/imageCompressor';
+import {
+  AlertCircle,
+  CheckCircle2,
+  ArrowLeft,
+  Send,
+  Upload,
+  X,
+  ShieldAlert,
+  Image as ImageIcon,
+  Loader2,
+} from 'lucide-react';
 
 const CATEGORIES = ['Road', 'Garbage', 'Water', 'Electricity', 'Other'];
 
 export const ReportComplaint = () => {
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -19,6 +31,8 @@ export const ReportComplaint = () => {
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [filePreview, setFilePreview] = useState(null);
+  const [fileSizeInfo, setFileSizeInfo] = useState('');
+  const [compressing, setCompressing] = useState(false);
   const [imageUrlInput, setImageUrlInput] = useState('');
 
   const [duplicates, setDuplicates] = useState([]);
@@ -47,7 +61,7 @@ export const ReportComplaint = () => {
     fetchDailyQuota();
   }, []);
 
-  // Duplicate Check effect: Checks title, description, category, and area
+  // Duplicate Check effect
   useEffect(() => {
     const hasEnoughText =
       formData.title.trim().length >= 3 || formData.description.trim().length >= 8;
@@ -80,27 +94,57 @@ export const ReportComplaint = () => {
     setDuplicateCheckDismissed(false);
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Check size limit: 5MB
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Selected image exceeds 5MB size limit.');
+    // Validate type
+    if (!file.type.startsWith('image/')) {
+      setError('Please select a valid image file (PNG, JPG, JPEG, WebP).');
       return;
     }
 
-    setSelectedFile(file);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setFilePreview(reader.result);
-    };
-    reader.readAsDataURL(file);
+    // Size limit: 10MB before compression
+    if (file.size > 10 * 1024 * 1024) {
+      setError('Selected image exceeds 10MB limit. Please choose a smaller photo.');
+      return;
+    }
+
+    setError('');
+    setCompressing(true);
+
+    try {
+      const origKb = Math.round(file.size / 1024);
+      // Auto-compress image on canvas to max 1280px for instant upload
+      const compressedDataUrl = await compressImage(file, 1280, 1280, 0.82);
+      setSelectedFile(file);
+      setFilePreview(compressedDataUrl);
+
+      // Estimate compressed size from base64 length
+      const compressedKb = Math.round((compressedDataUrl.length * 3) / 4 / 1024);
+      setFileSizeInfo(`${file.name} (${origKb} KB → ${compressedKb} KB optimized)`);
+    } catch (compressErr) {
+      console.warn('Compression fallback to direct reader:', compressErr);
+      // Fallback
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelectedFile(file);
+        setFilePreview(reader.result);
+        setFileSizeInfo(`${file.name} (${Math.round(file.size / 1024)} KB)`);
+      };
+      reader.readAsDataURL(file);
+    } finally {
+      setCompressing(false);
+    }
   };
 
   const handleRemoveFile = () => {
     setSelectedFile(null);
     setFilePreview(null);
+    setFileSizeInfo('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleUpvoteDuplicate = async (complaintId) => {
@@ -130,7 +174,7 @@ export const ReportComplaint = () => {
     try {
       let finalImageUrl = imageUrlInput.trim();
 
-      // If a file was selected, send base64 data URL
+      // If a file was selected and compressed, send data URL
       if (filePreview) {
         finalImageUrl = filePreview;
       }
@@ -148,7 +192,11 @@ export const ReportComplaint = () => {
         navigate('/complaints/mine');
       }, 1200);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to submit complaint. Please check your connection.');
+      console.error('Submit complaint error:', err);
+      setError(
+        err.response?.data?.message ||
+          'Failed to submit complaint. If you attached a large photo, please try a smaller image.'
+      );
     } finally {
       setLoading(false);
     }
@@ -315,40 +363,49 @@ export const ReportComplaint = () => {
           />
         </div>
 
-        {/* Photo Upload */}
+        {/* Photo Upload & Preview Section */}
         <div>
-          <label className="label-text">Photo proof (optional)</label>
-          
-          {filePreview ? (
-            <div className="relative inline-block mt-1">
-              <img
-                src={filePreview}
-                alt="Upload preview"
-                className="h-36 w-auto max-w-full rounded-xl border border-emerald-900/10 object-cover shadow-soft"
-              />
-              <button
-                type="button"
-                onClick={handleRemoveFile}
-                className="absolute -top-2 -right-2 bg-red-700 text-white p-1 rounded-full hover:bg-red-800 shadow-soft"
-                title="Remove photo"
-              >
-                <X className="h-3.5 w-3.5" strokeWidth={1.75} />
-              </button>
-              <div className="text-xs text-slate-500 mt-1">
-                {selectedFile?.name} ({(selectedFile?.size / 1024).toFixed(0)} KB)
+          <label className="label-text">Photo proof of issue (optional)</label>
+
+          {compressing ? (
+            <div className="p-6 rounded-2xl border border-emerald-900/10 bg-emerald-50/30 flex items-center justify-center gap-2 text-xs text-emerald-800 font-medium">
+              <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
+              <span>Optimizing and preparing photo...</span>
+            </div>
+          ) : filePreview ? (
+            <div className="relative inline-block mt-2">
+              <div className="relative rounded-2xl overflow-hidden border border-emerald-900/10 shadow-soft max-w-sm">
+                <img
+                  src={filePreview}
+                  alt="Upload preview"
+                  className="max-h-52 w-auto object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={handleRemoveFile}
+                  className="absolute top-2 right-2 bg-red-600 text-white p-1.5 rounded-full hover:bg-red-700 shadow-md transition-colors"
+                  title="Remove photo"
+                >
+                  <X className="h-4 w-4" strokeWidth={2} />
+                </button>
+              </div>
+              <div className="text-[11px] text-slate-500 font-medium mt-1.5 flex items-center gap-1">
+                <ImageIcon className="h-3 w-3 text-emerald-700" />
+                <span>{fileSizeInfo}</span>
               </div>
             </div>
           ) : (
             <div className="mt-1 space-y-2">
-              <label className="flex flex-col items-center justify-center border-2 border-dashed border-emerald-900/20 rounded-2xl p-4 hover:border-emerald-600 cursor-pointer bg-emerald-50/20 hover:bg-emerald-50/50 transition-colors">
-                <Upload className="h-5 w-5 text-emerald-600 mb-1" strokeWidth={1.75} />
+              <label className="flex flex-col items-center justify-center border-2 border-dashed border-emerald-900/20 rounded-2xl p-5 hover:border-emerald-600 cursor-pointer bg-emerald-50/20 hover:bg-emerald-50/50 transition-colors">
+                <Upload className="h-6 w-6 text-emerald-600 mb-1.5" strokeWidth={1.75} />
                 <span className="text-xs font-semibold text-slate-800">
-                  Select image from device
+                  Select image from device or take a photo
                 </span>
-                <span className="text-xs text-slate-500">
-                  PNG, JPG, WebP up to 5MB
+                <span className="text-xs text-slate-500 mt-0.5">
+                  PNG, JPG, WebP (auto-optimized for instant dispatch)
                 </span>
                 <input
+                  ref={fileInputRef}
                   type="file"
                   accept="image/*"
                   onChange={handleFileChange}
@@ -357,7 +414,7 @@ export const ReportComplaint = () => {
               </label>
 
               <div className="text-xs text-slate-400 text-center font-medium">
-                or provide an image URL:
+                or provide an external image URL:
               </div>
 
               <input
@@ -377,7 +434,7 @@ export const ReportComplaint = () => {
           </Link>
           <button
             type="submit"
-            disabled={loading || dailyQuota.remaining === 0}
+            disabled={loading || compressing || dailyQuota.remaining === 0}
             className="btn-primary text-xs inline-flex items-center gap-2"
           >
             <Send className="h-3.5 w-3.5" strokeWidth={1.75} />

@@ -6,6 +6,7 @@ import logo from '../assets/logo.png';
 import { PriorityBadge } from '../components/PriorityBadge';
 import { StatusBadge } from '../components/StatusBadge';
 import { generateWeeklyReportPdf } from '../utils/generateWeeklyReportPdf';
+import { downloadComplaintsAsCSV } from '../utils/csvExporter';
 import {
   Download,
   Search,
@@ -86,21 +87,35 @@ export const OfficerDashboard = () => {
     return () => clearTimeout(timer);
   }, [search, category, status, priority, sortBy]);
 
-  // CSV Export
+  // CSV Export with server query and client fallback
   const handleExportCSV = async () => {
     setDownloadingCsv(true);
+    const filename = `municipal-complaints-${new Date().toISOString().slice(0, 10)}.csv`;
     try {
-      const res = await api.get('/complaints/export/csv', { responseType: 'blob' });
-      const blobUrl = window.URL.createObjectURL(new Blob([res.data]));
+      const params = new URLSearchParams();
+      if (category !== 'All') params.append('category', category);
+      if (status !== 'All') params.append('status', status);
+      if (priority !== 'All') params.append('priority', priority);
+      if (search.trim()) params.append('search', search.trim());
+      if (sortBy) params.append('sortBy', sortBy);
+
+      const queryString = params.toString();
+      const exportUrl = queryString ? `/complaints/export?${queryString}` : '/complaints/export';
+
+      const res = await api.get(exportUrl, { responseType: 'blob' });
+      const blob = new Blob([res.data], { type: 'text/csv;charset=utf-8;' });
+      const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = blobUrl;
-      link.setAttribute('download', `municipal-complaints-${new Date().toISOString().slice(0, 10)}.csv`);
+      link.setAttribute('download', filename);
       document.body.appendChild(link);
       link.click();
       link.remove();
+      window.URL.revokeObjectURL(blobUrl);
     } catch (err) {
-      console.error('Error downloading CSV:', err);
-      alert('Failed to generate CSV export. Please try again.');
+      console.warn('Server CSV route fallback to client-side exporter:', err);
+      // Fail-safe client export using currently filtered dataset
+      downloadComplaintsAsCSV(complaints, filename);
     } finally {
       setDownloadingCsv(false);
     }
