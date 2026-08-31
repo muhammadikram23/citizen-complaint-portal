@@ -5,7 +5,7 @@ import logo from '../assets/logo.png';
 import { PriorityBadge } from '../components/PriorityBadge';
 import { StatusBadge } from '../components/StatusBadge';
 import { FeedbackModal } from '../components/FeedbackModal';
-import { PlusCircle, Star, MessageSquare, CheckCircle2, Search, Clock } from 'lucide-react';
+import { PlusCircle, Star, MessageSquare, CheckCircle2, Search, Clock, ArrowRight } from 'lucide-react';
 
 export const MyComplaints = () => {
   const [complaints, setComplaints] = useState([]);
@@ -65,15 +65,17 @@ export const MyComplaints = () => {
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-4">
+      {/* Header with prominent Action Button */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-emerald-900/10 pb-5">
         <div className="flex items-center gap-4">
-          <img src={logo} alt="Municipal Logo" className="h-16 sm:h-20 w-auto object-contain shrink-0" />
+          <div className="p-2 rounded-2xl bg-white border border-emerald-900/10 shadow-soft shrink-0">
+            <img src={logo} alt="Municipal Logo" className="h-14 sm:h-16 w-auto object-contain shrink-0" />
+          </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-950 font-serif">
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-950">
               My filed complaints
             </h1>
-            <p className="text-xs text-gray-600 mt-0.5">
+            <p className="text-xs text-slate-600 mt-0.5">
               Track municipal progress, review official remarks, and evaluate completed repairs.
             </p>
           </div>
@@ -81,30 +83,30 @@ export const MyComplaints = () => {
 
         <Link
           to="/complaints/new"
-          className="btn-primary inline-flex items-center gap-2 self-start sm:self-auto text-xs"
+          className="btn-primary inline-flex items-center gap-2 self-start sm:self-auto text-xs sm:text-sm"
         >
-          <PlusCircle className="h-4 w-4" strokeWidth={1.75} />
+          <PlusCircle className="h-4 w-4" strokeWidth={2} />
           Report another issue
         </Link>
       </div>
 
       {successMessage && (
-        <div className="p-3.5 rounded bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-medium flex items-center gap-2">
+        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 font-medium flex items-center gap-2.5 shadow-soft">
           <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" strokeWidth={1.75} />
           <span>{successMessage}</span>
         </div>
       )}
 
       {/* Filter Tabs & Search */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-1 bg-slate-200 p-1 rounded text-xs font-medium self-start">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-emerald-900/10 shadow-soft">
+        <div className="flex items-center gap-1.5 p-1 bg-emerald-50/50 rounded-xl border border-emerald-900/10 text-xs font-medium self-start sm:self-auto">
           {['All', 'Pending', 'In Progress', 'Resolved'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-3 py-1.5 rounded transition-colors ${
+              className={`px-3 py-1.5 rounded-lg transition-all text-xs font-medium ${
                 activeTab === tab
-                  ? 'bg-white text-slate-950 font-semibold shadow-xs'
+                  ? 'bg-emerald-600 text-white font-semibold shadow-soft'
                   : 'text-slate-600 hover:text-slate-950'
               }`}
             >
@@ -114,24 +116,24 @@ export const MyComplaints = () => {
         </div>
 
         <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" strokeWidth={1.75} />
+          <Search className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" strokeWidth={1.75} />
           <input
             type="text"
             placeholder="Filter by keyword or area..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="input-field pl-9 text-xs"
+            className="input-field pl-10 text-xs"
           />
         </div>
       </div>
 
       {/* Complaints List */}
       {loading ? (
-        <div className="py-12 text-center text-xs text-slate-500">
+        <div className="py-12 text-center text-xs text-slate-500 bg-white border border-emerald-900/10 rounded-2xl shadow-soft">
           Loading your complaint records...
         </div>
       ) : filteredComplaints.length === 0 ? (
-        <div className="p-12 text-center bg-white border border-slate-300 rounded space-y-3">
+        <div className="p-12 text-center bg-white border border-emerald-900/10 rounded-2xl space-y-3 shadow-soft">
           <div className="text-sm font-semibold text-slate-900">
             No complaints found
           </div>
@@ -141,7 +143,7 @@ export const MyComplaints = () => {
               : 'You have not submitted any complaints in this category.'}
           </p>
           <Link to="/complaints/new" className="btn-primary text-xs inline-flex items-center gap-1.5 mt-1">
-            <PlusCircle className="h-3.5 w-3.5" strokeWidth={1.75} />
+            <PlusCircle className="h-3.5 w-3.5" strokeWidth={2} />
             File a complaint
           </Link>
         </div>
@@ -150,24 +152,24 @@ export const MyComplaints = () => {
           {filteredComplaints.map((c) => (
             <div
               key={c._id}
-              className={`bg-white border rounded p-5 space-y-4 ${
+              className={`bg-white border rounded-2xl p-5 sm:p-6 space-y-4 shadow-soft hover:shadow-soft-md transition-all ${
                 c.status === 'Resolved' && c.feedbackPending
-                  ? 'border-amber-300 ring-1 ring-amber-200'
-                  : 'border-slate-300'
+                  ? 'border-amber-400 ring-1 ring-amber-200'
+                  : 'border-emerald-900/10 hover:border-emerald-600/30'
               }`}
             >
               {/* Top row */}
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-medium bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">
+                    <span className="text-[11px] font-medium bg-emerald-50 text-emerald-900 px-2.5 py-0.5 rounded-full border border-emerald-200/70">
                       {c.category}
                     </span>
                     <PriorityBadge priority={c.priority} score={c.priorityScore} />
                     <StatusBadge status={c.status} />
                   </div>
                   <h2 className="text-base font-bold text-slate-950">
-                    <Link to={`/complaints/${c._id}`} className="hover:underline">
+                    <Link to={`/complaints/${c._id}`} className="hover:text-emerald-700 hover:underline">
                       {c.title}
                     </Link>
                   </h2>
@@ -183,7 +185,7 @@ export const MyComplaints = () => {
                 <div className="shrink-0">
                   <Link
                     to={`/complaints/${c._id}`}
-                    className="btn-secondary text-xs"
+                    className="btn-secondary text-xs min-h-[36px] py-1 px-3"
                   >
                     View details
                   </Link>
@@ -192,7 +194,7 @@ export const MyComplaints = () => {
 
               {/* Photo Proof */}
               {c.imageUrl && c.imageUrl.trim() !== '' && (
-                <div className="relative h-44 w-full overflow-hidden rounded border border-slate-200 bg-slate-100">
+                <div className="relative h-44 w-full overflow-hidden rounded-xl border border-emerald-900/10 bg-emerald-50/30">
                   <img
                     src={c.imageUrl}
                     alt={c.title}
@@ -211,7 +213,7 @@ export const MyComplaints = () => {
 
               {/* Official Officer Remark */}
               {c.officerRemark && (
-                <div className="bg-slate-50 border border-slate-200 rounded p-3 text-xs space-y-1">
+                <div className="bg-emerald-50/40 border border-emerald-900/10 rounded-xl p-3.5 text-xs space-y-1">
                   <div className="font-semibold text-slate-900 flex items-center gap-1.5">
                     <MessageSquare className="h-3.5 w-3.5 text-slate-700" strokeWidth={1.75} />
                     Official officer remark
@@ -224,7 +226,7 @@ export const MyComplaints = () => {
 
               {/* Resolution Feedback Prompt */}
               {c.status === 'Resolved' && c.feedbackPending && (
-                <div className="bg-amber-50 border border-amber-300 rounded p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div className="bg-amber-50 border border-amber-300 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                   <div>
                     <div className="font-bold text-amber-950 flex items-center gap-1.5">
                       <Star className="h-4 w-4 text-amber-600 fill-amber-600" strokeWidth={1.75} />
@@ -246,7 +248,7 @@ export const MyComplaints = () => {
 
               {/* Submitted Citizen Feedback Display */}
               {c.feedbackGiven && (
-                <div className="bg-emerald-50 border border-emerald-200 rounded p-3 text-xs flex items-center justify-between gap-3">
+                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 text-xs flex items-center justify-between gap-3">
                   <div className="space-y-0.5">
                     <div className="font-semibold text-emerald-950 flex items-center gap-1">
                       <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" strokeWidth={1.75} />
@@ -263,18 +265,19 @@ export const MyComplaints = () => {
               )}
 
               {/* Status History & Audit Summary Row */}
-              <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+              <div className="pt-2.5 border-t border-emerald-900/10 flex items-center justify-between text-xs text-slate-500">
                 <span className="flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5 text-slate-400" strokeWidth={1.75} />
+                  <Clock className="h-3.5 w-3.5 text-emerald-700" strokeWidth={1.75} />
                   <span>
                     <strong>{c.statusHistory?.length || 1}</strong> status event{c.statusHistory?.length === 1 ? '' : 's'} in audit history
                   </span>
                 </span>
                 <Link
                   to={`/complaints/${c._id}`}
-                  className="font-semibold text-slate-900 hover:underline"
+                  className="font-semibold text-emerald-700 hover:text-emerald-800 hover:underline flex items-center gap-1"
                 >
-                  View full timeline &rarr;
+                  <span>View full timeline</span>
+                  <ArrowRight className="h-3 w-3" strokeWidth={2} />
                 </Link>
               </div>
             </div>

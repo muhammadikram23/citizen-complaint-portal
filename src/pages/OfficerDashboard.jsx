@@ -12,6 +12,8 @@ import {
   RefreshCw,
   Star,
   FileText,
+  ShieldCheck,
+  TrendingUp,
 } from 'lucide-react';
 
 const CATEGORIES = ['All', 'Road', 'Garbage', 'Water', 'Electricity', 'Other'];
@@ -84,39 +86,27 @@ export const OfficerDashboard = () => {
     return () => clearTimeout(timer);
   }, [search, category, status, priority, sortBy]);
 
-  // Export Complaints to CSV
+  // CSV Export
   const handleExportCSV = async () => {
     setDownloadingCsv(true);
     try {
-      const params = new URLSearchParams();
-      if (category !== 'All') params.append('category', category);
-      if (status !== 'All') params.append('status', status);
-      if (priority !== 'All') params.append('priority', priority);
-      if (search.trim()) params.append('search', search.trim());
-
-      const res = await api.get(`/complaints/export?${params.toString()}`, {
-        responseType: 'blob',
-      });
-
-      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const res = await api.get('/complaints/export/csv', { responseType: 'blob' });
+      const blobUrl = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute(
-        'download',
-        `complaints_export_${new Date().toISOString().slice(0, 10)}.csv`
-      );
+      link.href = blobUrl;
+      link.setAttribute('download', `municipal-complaints-${new Date().toISOString().slice(0, 10)}.csv`);
       document.body.appendChild(link);
       link.click();
       link.remove();
     } catch (err) {
-      console.error('CSV Export Error:', err);
-      alert('Failed to generate CSV export.');
+      console.error('Error downloading CSV:', err);
+      alert('Failed to generate CSV export. Please try again.');
     } finally {
       setDownloadingCsv(false);
     }
   };
 
-  // Generate and download complete executive weekly operations PDF report
+  // PDF Executive Summary Report
   const handleDownloadWeeklyReport = async () => {
     setGeneratingPdf(true);
     try {
@@ -139,17 +129,19 @@ export const OfficerDashboard = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-emerald-900/10 pb-5">
         <div className="flex items-center gap-4">
-          <img src={logo} alt="Municipal Logo" className="h-16 sm:h-20 w-auto object-contain shrink-0" />
+          <div className="p-2 rounded-2xl bg-white border border-emerald-900/10 shadow-soft shrink-0">
+            <img src={logo} alt="Municipal Logo" className="h-14 sm:h-16 w-auto object-contain shrink-0" />
+          </div>
           <div>
-            <div className="text-xs font-semibold text-gray-500 mb-0.5">
+            <div className="text-xs font-semibold text-emerald-800 mb-0.5 uppercase tracking-wider">
               Officer operations center
             </div>
-            <h1 className="text-2xl sm:text-3xl text-gray-950">
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-950">
               Municipal complaints management
             </h1>
-            <p className="text-xs text-gray-600 mt-0.5">
+            <p className="text-xs text-slate-600 mt-0.5">
               Triage civic tickets, assign field teams, and review automated dynamic priority ranking.
             </p>
           </div>
@@ -163,54 +155,54 @@ export const OfficerDashboard = () => {
             className="btn-secondary text-xs inline-flex items-center gap-1.5"
             title="Download CSV report of currently filtered records"
           >
-            <Download className="h-4 w-4 text-gray-600" strokeWidth={1.5} />
+            <Download className="h-4 w-4 text-emerald-700" strokeWidth={1.75} />
             {downloadingCsv ? 'Generating CSV...' : 'Download CSV report'}
           </button>
         </div>
       </div>
 
       {/* AI Daily Briefing Card */}
-      <section className="bg-white border border-gray-300 rounded p-5 space-y-4 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-200 pb-3">
+      <section className="bg-white border border-emerald-900/10 rounded-3xl p-6 sm:p-7 space-y-4 shadow-soft">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-emerald-900/10 pb-4">
           <div>
-            <h2 className="text-lg text-gray-950 font-serif">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-950">
               Operations daily briefing
             </h2>
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-slate-500 font-medium">
               Synthesized from active tickets and municipal response SLAs
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <button
               type="button"
               onClick={handleDownloadWeeklyReport}
               disabled={generatingPdf}
-              className="btn-secondary text-xs min-h-[36px] py-1 px-2.5 inline-flex items-center gap-1.5"
+              className="btn-secondary text-xs min-h-[38px] py-1.5 px-3.5 inline-flex items-center gap-1.5"
               title="Download complete executive weekly operations PDF summary report"
             >
-              <FileText className="h-3.5 w-3.5" strokeWidth={1.5} />
+              <FileText className="h-3.5 w-3.5 text-emerald-700" strokeWidth={1.75} />
               {generatingPdf ? 'Generating PDF...' : 'Download PDF summary'}
             </button>
 
             <button
               onClick={fetchAiBriefing}
               disabled={loadingAi}
-              className="btn-secondary text-xs min-h-[36px] py-1 px-2.5 inline-flex items-center gap-1.5"
+              className="btn-secondary text-xs min-h-[38px] py-1.5 px-3.5 inline-flex items-center gap-1.5"
               title="Refresh briefing with latest metrics"
             >
-              <RefreshCw className={`h-3.5 w-3.5 ${loadingAi ? 'animate-spin' : ''}`} strokeWidth={1.5} />
+              <RefreshCw className={`h-3.5 w-3.5 text-slate-700 ${loadingAi ? 'animate-spin' : ''}`} strokeWidth={1.75} />
               Refresh briefing
             </button>
           </div>
         </div>
 
         {loadingAi ? (
-          <div className="py-3 text-xs text-gray-500">
+          <div className="py-4 text-xs text-slate-500 font-medium">
             Synthesizing operational briefing...
           </div>
         ) : (
-          <p className="max-w-none w-full text-xs sm:text-sm text-gray-800 leading-relaxed bg-gray-50 p-4 rounded border border-gray-200">
+          <p className="max-w-none w-full text-xs sm:text-sm text-slate-800 leading-relaxed bg-emerald-50/40 p-4 sm:p-5 rounded-2xl border border-emerald-900/10 shadow-soft">
             {aiSummary}
           </p>
         )}
@@ -218,58 +210,52 @@ export const OfficerDashboard = () => {
         {/* Operational Statistics Grid */}
         {aiStats && (
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-1 font-sans">
-            <div className="bg-gray-50 p-3 rounded border border-gray-200">
-              <div className="text-[11px] font-medium text-gray-500">Total logged</div>
-              <div className="text-xl font-bold text-gray-950 mt-0.5">
-                {aiStats.totalComplaints}
-              </div>
+            <div className="p-3.5 rounded-2xl bg-white border border-emerald-900/10 shadow-soft">
+              <div className="text-[11px] text-slate-500 font-medium">Total active</div>
+              <div className="text-xl font-bold text-slate-950 mt-0.5">{aiStats.total}</div>
             </div>
 
-            <div className="bg-red-50 p-3 rounded border border-red-200">
-              <div className="text-[11px] font-semibold text-red-900">Critical priority</div>
-              <div className="text-xl font-bold text-red-950 mt-0.5">
-                {aiStats.criticalCount}
-              </div>
+            <div className="p-3.5 rounded-2xl bg-white border border-emerald-900/10 shadow-soft">
+              <div className="text-[11px] text-slate-500 font-medium">Pending triage</div>
+              <div className="text-xl font-bold text-slate-950 mt-0.5">{aiStats.pending}</div>
             </div>
 
-            <div className="bg-amber-50 p-3 rounded border border-amber-200">
-              <div className="text-[11px] font-semibold text-amber-900">Overdue (&gt;3 days)</div>
-              <div className="text-xl font-bold text-amber-950 mt-0.5">
-                {aiStats.overdueCount}
-              </div>
+            <div className="p-3.5 rounded-2xl bg-white border border-emerald-900/10 shadow-soft">
+              <div className="text-[11px] text-slate-500 font-medium">In repair</div>
+              <div className="text-xl font-bold text-blue-900 mt-0.5">{aiStats.inProgress}</div>
             </div>
 
-            <div className="bg-emerald-50 p-3 rounded border border-emerald-200">
-              <div className="text-[11px] font-semibold text-emerald-900">Resolved this week</div>
-              <div className="text-xl font-bold text-emerald-950 mt-0.5">
-                {aiStats.resolvedThisWeek}
-              </div>
+            <div className="p-3.5 rounded-2xl bg-white border border-emerald-900/10 shadow-soft">
+              <div className="text-[11px] text-slate-500 font-medium">Resolved</div>
+              <div className="text-xl font-bold text-emerald-900 mt-0.5">{aiStats.resolved}</div>
             </div>
 
-            <div className="bg-blue-50 p-3 rounded border border-blue-200 col-span-2 sm:col-span-1">
-              <div className="text-[11px] font-semibold text-blue-900">Avg citizen rating</div>
-              <div className="text-xl font-bold text-blue-950 mt-0.5 flex items-center gap-1">
-                {aiStats.avgCitizenRating > 0 ? `${aiStats.avgCitizenRating} / 5` : 'N/A'}
-                {aiStats.avgCitizenRating > 0 && <Star className="h-3.5 w-3.5 fill-blue-800 text-blue-800" />}
+            <div className="p-3.5 rounded-2xl bg-white border border-emerald-900/10 shadow-soft col-span-2 sm:col-span-1">
+              <div className="text-[11px] text-slate-500 font-medium flex items-center gap-1">
+                <span>Citizen rating</span>
+                <Star className="h-3 w-3 text-amber-500 fill-amber-500" />
+              </div>
+              <div className="text-xl font-bold text-slate-950 mt-0.5">
+                {aiStats.averageCitizenRating ? `${aiStats.averageCitizenRating}/5` : 'N/A'}
               </div>
             </div>
           </div>
         )}
       </section>
 
-      {/* Filter Bar */}
-      <section className="bg-white border border-gray-300 rounded overflow-hidden">
-        <div className="p-4 border-b border-gray-200 space-y-3 bg-gray-50/50">
+      {/* Complaints Management Table Section */}
+      <section className="bg-white border border-emerald-900/10 rounded-3xl overflow-hidden shadow-soft">
+        <div className="p-5 border-b border-emerald-900/10 space-y-3.5">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
             {/* Search */}
             <div className="relative lg:col-span-2">
-              <Search className="absolute left-3 top-3.5 h-4 w-4 text-gray-400" strokeWidth={1.5} />
+              <Search className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" strokeWidth={1.75} />
               <input
                 type="text"
                 placeholder="Search ticket title, area, or description..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="input-field pl-9 text-xs"
+                className="input-field pl-10 text-xs"
               />
             </div>
 
@@ -308,7 +294,7 @@ export const OfficerDashboard = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="input-field text-xs font-medium text-gray-900"
+                className="input-field text-xs font-medium"
               >
                 <option value="priority">Sort: Highest priority</option>
                 <option value="newest">Sort: Newest first</option>
@@ -320,41 +306,41 @@ export const OfficerDashboard = () => {
 
           {/* Priority Quick Filter */}
           <div className="flex items-center gap-2 flex-wrap text-xs pt-1">
-            <span className="text-gray-500">Filter priority:</span>
+            <span className="text-slate-500 font-medium">Filter priority:</span>
             {PRIORITIES.map((p) => (
               <button
                 key={p}
                 onClick={() => setPriority(p)}
-                className={`px-2.5 py-0.5 rounded text-xs transition-colors ${
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
                   priority === p
-                    ? 'bg-emerald-600 text-white font-semibold shadow-xs'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-emerald-600 text-white font-semibold shadow-soft'
+                    : 'bg-emerald-50/50 text-slate-700 hover:bg-emerald-100/60 border border-emerald-900/10'
                 }`}
               >
                 {p}
               </button>
             ))}
-            <span className="ml-auto text-xs text-gray-500">
+            <span className="ml-auto text-xs text-slate-500 font-medium">
               Showing {complaints.length} records
             </span>
           </div>
         </div>
 
         {/* Mobile View: Stacked Cards */}
-        <div className="md:hidden divide-y divide-gray-200">
+        <div className="md:hidden divide-y divide-emerald-900/10">
           {loadingComplaints ? (
-            <div className="p-8 text-center text-xs text-gray-500">
+            <div className="p-8 text-center text-xs text-slate-500">
               Loading complaints data...
             </div>
           ) : complaints.length === 0 ? (
-            <div className="p-8 text-center text-xs text-gray-500">
+            <div className="p-8 text-center text-xs text-slate-500">
               No complaint records found matching active filters.
             </div>
           ) : (
             complaints.map((item) => (
-              <div key={item._id} className="p-4 space-y-2.5 bg-white">
+              <div key={item._id} className="p-5 space-y-3 bg-white">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs font-medium bg-gray-100 text-gray-700 px-2 py-0.5 rounded border border-gray-200">
+                  <span className="text-[11px] font-medium bg-emerald-50 text-emerald-900 px-2.5 py-0.5 rounded-full border border-emerald-200/70">
                     {item.category}
                   </span>
                   <div className="flex items-center gap-1.5">
@@ -366,22 +352,22 @@ export const OfficerDashboard = () => {
                 <div>
                   <Link
                     to={`/officer/complaints/${item._id}`}
-                    className="font-bold text-gray-950 text-sm hover:underline block font-sans"
+                    className="font-bold text-slate-950 text-sm hover:text-emerald-700 hover:underline block"
                   >
                     {item.title}
                   </Link>
-                  <div className="text-xs text-gray-500 mt-0.5">
-                    Area: <strong className="text-gray-800 font-medium">{item.area}</strong> &bull; Upvotes: <strong className="text-gray-900">{item.upvotes}</strong>
+                  <div className="text-xs text-slate-500 mt-0.5">
+                    Area: <strong className="text-slate-800 font-medium">{item.area}</strong> &bull; Upvotes: <strong className="text-slate-900">{item.upvotes}</strong>
                   </div>
                 </div>
 
                 <div className="pt-2 flex items-center justify-between text-xs">
-                  <span className="text-gray-500">
+                  <span className="text-slate-500">
                     {item.createdBy?.name || 'Citizen'} &bull; {new Date(item.createdAt).toLocaleDateString()}
                   </span>
                   <Link
                     to={`/officer/complaints/${item._id}`}
-                    className="btn-primary text-xs min-h-[36px] py-1 px-3"
+                    className="btn-primary text-xs min-h-[36px] py-1 px-3.5"
                   >
                     Review & resolve
                   </Link>
@@ -395,78 +381,78 @@ export const OfficerDashboard = () => {
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-gray-100 border-b border-gray-300 text-gray-700 font-semibold">
-                <th className="py-2.5 px-4">Complaint & Area</th>
-                <th className="py-2.5 px-4">Category</th>
-                <th className="py-2.5 px-4">Priority score</th>
-                <th className="py-2.5 px-4">Status</th>
-                <th className="py-2.5 px-4">Upvotes</th>
-                <th className="py-2.5 px-4">Filed by / Date</th>
-                <th className="py-2.5 px-4 text-right">Actions</th>
+              <tr className="bg-emerald-50/40 border-b border-emerald-900/10 text-slate-700 font-semibold">
+                <th className="py-3 px-4">Complaint & Area</th>
+                <th className="py-3 px-4">Category</th>
+                <th className="py-3 px-4">Priority tier</th>
+                <th className="py-3 px-4">Status</th>
+                <th className="py-3 px-4">Upvotes</th>
+                <th className="py-3 px-4">Filed by / Date</th>
+                <th className="py-3 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-emerald-900/10">
               {loadingComplaints ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-12 text-xs text-gray-500">
+                  <td colSpan={7} className="text-center py-12 text-xs text-slate-500">
                     Loading municipal registry records...
                   </td>
                 </tr>
               ) : complaints.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-12 text-xs text-gray-500">
+                  <td colSpan={7} className="text-center py-12 text-xs text-slate-500">
                     No complaint records found matching active filters.
                   </td>
                 </tr>
               ) : (
                 complaints.map((item) => (
-                  <tr key={item._id} className="hover:bg-gray-50 transition-colors">
-                    <td className="py-3 px-4 max-w-xs">
+                  <tr key={item._id} className="hover:bg-emerald-50/30 transition-colors">
+                    <td className="py-3.5 px-4 max-w-xs">
                       <Link
                         to={`/officer/complaints/${item._id}`}
-                        className="font-semibold text-gray-950 hover:underline block truncate"
+                        className="font-semibold text-slate-950 hover:text-emerald-700 hover:underline block truncate"
                         title={item.title}
                       >
                         {item.title}
                       </Link>
-                      <div className="text-gray-500 text-[11px] mt-0.5">
-                        Area: <span className="text-gray-800 font-medium">{item.area}</span>
+                      <div className="text-slate-500 text-[11px] mt-0.5">
+                        Area: <span className="text-slate-800 font-medium">{item.area}</span>
                       </div>
                       {item.officerRemark && (
-                        <div className="text-gray-600 italic truncate text-[11px] mt-0.5" title={item.officerRemark}>
+                        <div className="text-slate-600 italic truncate text-[11px] mt-0.5" title={item.officerRemark}>
                           Remark: "{item.officerRemark}"
                         </div>
                       )}
                     </td>
 
-                    <td className="py-3 px-4 whitespace-nowrap">
-                      <span className="text-xs font-medium bg-gray-100 text-gray-700 px-2 py-0.5 rounded border border-gray-200">
+                    <td className="py-3.5 px-4 whitespace-nowrap">
+                      <span className="text-[11px] font-medium bg-emerald-50 text-emerald-900 px-2.5 py-0.5 rounded-full border border-emerald-200/70">
                         {item.category}
                       </span>
                     </td>
 
-                    <td className="py-3 px-4 whitespace-nowrap">
+                    <td className="py-3.5 px-4 whitespace-nowrap">
                       <PriorityBadge priority={item.priority} score={item.priorityScore} />
                     </td>
 
-                    <td className="py-3 px-4 whitespace-nowrap">
+                    <td className="py-3.5 px-4 whitespace-nowrap">
                       <StatusBadge status={item.status} />
                     </td>
 
-                    <td className="py-3 px-4 whitespace-nowrap font-semibold text-gray-900">
+                    <td className="py-3.5 px-4 whitespace-nowrap font-semibold text-slate-900">
                       {item.upvotes}
                     </td>
 
-                    <td className="py-3 px-4 whitespace-nowrap text-gray-600">
-                      <div className="font-medium text-gray-800">
+                    <td className="py-3.5 px-4 whitespace-nowrap text-slate-600">
+                      <div className="font-medium text-slate-800">
                         {item.createdBy?.name || 'Citizen'}
                       </div>
-                      <div className="text-[11px] text-gray-500">
+                      <div className="text-[11px] text-slate-500">
                         {new Date(item.createdAt).toLocaleDateString()}
                       </div>
                     </td>
 
-                    <td className="py-3 px-4 whitespace-nowrap text-right">
+                    <td className="py-3.5 px-4 whitespace-nowrap text-right">
                       <Link
                         to={`/officer/complaints/${item._id}`}
                         className="btn-primary text-xs min-h-[34px] py-1 px-3"

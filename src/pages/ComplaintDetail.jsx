@@ -75,7 +75,7 @@ export const ComplaintDetail = () => {
 
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-16 text-center text-xs text-slate-500">
+      <div className="max-w-4xl mx-auto px-4 py-16 text-center text-xs text-slate-500 bg-white border border-emerald-900/10 rounded-2xl shadow-soft">
         Loading complaint record...
       </div>
     );
@@ -84,7 +84,7 @@ export const ComplaintDetail = () => {
   if (error || !complaint) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <div className="p-6 bg-white border border-slate-300 rounded text-center space-y-3">
+        <div className="p-8 bg-white border border-emerald-900/10 rounded-2xl text-center space-y-3 shadow-soft">
           <AlertCircle className="h-8 w-8 text-red-600 mx-auto" strokeWidth={1.75} />
           <h2 className="text-base font-bold text-slate-900">Complaint record not found</h2>
           <p className="text-xs text-slate-500">{error || 'The requested ticket could not be retrieved.'}</p>
@@ -109,7 +109,7 @@ export const ComplaintDetail = () => {
       <div className="flex items-center justify-between">
         <Link
           to="/complaints"
-          className="inline-flex items-center gap-1 text-xs font-semibold text-slate-600 hover:text-slate-950 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-emerald-800 transition-colors"
         >
           <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.75} />
           Back to public feed
@@ -127,34 +127,36 @@ export const ComplaintDetail = () => {
       </div>
 
       {actionSuccess && (
-        <div className="p-3.5 rounded bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-medium flex items-center gap-2">
+        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 font-medium flex items-center gap-2.5 shadow-soft">
           <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" strokeWidth={1.75} />
           <span>{actionSuccess}</span>
         </div>
       )}
 
       {/* Main Detail Document Card */}
-      <article className="bg-white border border-gray-300 rounded p-6 sm:p-8 space-y-6 shadow-xs">
+      <article className="bg-white border border-emerald-900/10 rounded-3xl p-6 sm:p-8 space-y-6 shadow-soft">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-gray-200 pb-5">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-emerald-900/10 pb-5">
           <div className="flex items-start gap-4">
-            <img src={logo} alt="Municipal Logo" className="h-16 sm:h-20 w-auto object-contain shrink-0 mt-0.5" />
+            <div className="p-2 rounded-2xl bg-white border border-emerald-900/10 shadow-soft shrink-0 mt-0.5">
+              <img src={logo} alt="Municipal Logo" className="h-14 sm:h-16 w-auto object-contain shrink-0" />
+            </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-medium bg-gray-100 text-gray-800 px-2.5 py-0.5 rounded border border-gray-200">
+                <span className="text-[11px] font-medium bg-emerald-50 text-emerald-900 px-2.5 py-0.5 rounded-full border border-emerald-200/70">
                   {complaint.category}
                 </span>
                 <PriorityBadge priority={complaint.priority} score={complaint.priorityScore} />
                 <StatusBadge status={complaint.status} />
               </div>
 
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-950 font-serif leading-tight">
+              <h1 className="text-xl sm:text-2xl font-bold text-slate-950 leading-tight">
                 {complaint.title}
               </h1>
 
-              <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 pt-1">
+              <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 pt-1 font-medium">
                 <span className="flex items-center gap-1">
-                  <MapPin className="h-3.5 w-3.5 text-slate-400" strokeWidth={1.75} />
+                  <MapPin className="h-3.5 w-3.5 text-emerald-700" strokeWidth={1.75} />
                   {complaint.area}
                 </span>
                 <span className="flex items-center gap-1">
@@ -174,7 +176,7 @@ export const ComplaintDetail = () => {
               onClick={handleUpvote}
               className="btn-secondary text-xs inline-flex items-center gap-1.5"
             >
-              <ThumbsUp className="h-3.5 w-3.5 text-slate-700" strokeWidth={1.75} />
+              <ThumbsUp className="h-3.5 w-3.5 text-emerald-700" strokeWidth={1.75} />
               Upvote complaint ({complaint.upvotes})
             </button>
           </div>
@@ -199,7 +201,7 @@ export const ComplaintDetail = () => {
             <img
               src={complaint.imageUrl}
               alt={complaint.title}
-              className="max-h-80 rounded border border-slate-300 object-cover"
+              className="max-h-80 rounded-2xl border border-emerald-900/10 object-cover shadow-soft"
               onError={(e) => {
                 e.target.style.display = 'none';
               }}
@@ -208,15 +210,15 @@ export const ComplaintDetail = () => {
         )}
 
         {/* Officer Response Section */}
-        <div className="space-y-3 pt-4 border-t border-slate-200">
+        <div className="space-y-3 pt-4 border-t border-emerald-900/10">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
             Municipal department response
           </h2>
 
           {complaint.officerRemark ? (
-            <div className="bg-slate-50 border border-slate-200 rounded p-4 space-y-1">
+            <div className="bg-emerald-50/40 border border-emerald-900/10 rounded-2xl p-4 space-y-1">
               <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                <ShieldCheck className="h-4 w-4 text-slate-700" strokeWidth={1.75} />
+                <ShieldCheck className="h-4 w-4 text-emerald-700" strokeWidth={1.75} />
                 Official officer remark
               </div>
               <p className="text-xs text-slate-700 italic">
@@ -227,7 +229,7 @@ export const ComplaintDetail = () => {
               </div>
             </div>
           ) : (
-            <div className="p-3 rounded border border-slate-200 text-xs text-slate-500">
+            <div className="p-3.5 rounded-2xl border border-emerald-900/10 bg-emerald-50/20 text-xs text-slate-500">
               No official officer remark has been posted yet. Status remains {complaint.status}.
             </div>
           )}
@@ -235,13 +237,13 @@ export const ComplaintDetail = () => {
 
         {/* Citizen Feedback Section */}
         {complaint.status === 'Resolved' && (
-          <div className="space-y-3 pt-4 border-t border-slate-200">
+          <div className="space-y-3 pt-4 border-t border-emerald-900/10">
             <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
               Citizen satisfaction verification
             </h2>
 
             {complaint.feedbackGiven ? (
-              <div className="bg-emerald-50 border border-emerald-200 rounded p-4 space-y-1">
+              <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 space-y-1">
                 <div className="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
                   <CheckCircle2 className="h-4 w-4 text-emerald-600" strokeWidth={1.75} />
                   Citizen resolution rating: {complaint.feedbackRating} / 5 stars
@@ -253,7 +255,7 @@ export const ComplaintDetail = () => {
                 )}
               </div>
             ) : isOwner ? (
-              <div className="bg-amber-50 border border-amber-300 rounded p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="bg-amber-50 border border-amber-300 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                 <div>
                   <div className="font-bold text-amber-950">You reported this issue</div>
                   <p className="text-amber-900 text-xs mt-0.5">
@@ -278,7 +280,7 @@ export const ComplaintDetail = () => {
 
         {/* Status History & Audit Trail Timeline */}
         {complaint.statusHistory && complaint.statusHistory.length > 0 && (
-          <div className="pt-4 border-t border-slate-200">
+          <div className="pt-4 border-t border-emerald-900/10">
             <StatusHistoryTimeline history={complaint.statusHistory} />
           </div>
         )}

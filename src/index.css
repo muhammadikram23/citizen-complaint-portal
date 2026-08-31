@@ -3,35 +3,19 @@
 @tailwind utilities;
 
 :root {
-  --color-bg: 247 247 248;
+  --color-bg: 246 250 247; /* Very light greenish white like logo */
   --color-surface: 255 255 255;
-  --color-border: 209 213 219;
+  --color-border: 226 235 229;
   --color-text: 17 24 39;
   --color-text-muted: 75 85 99;
-  --color-accent: 30 58 95;
-  --color-accent-hover: 21 43 71;
-  --color-accent-soft: 239 246 255;
-  --color-danger: 220 38 38;
-  --color-danger-hover: 185 28 28;
-  --color-danger-soft: 254 242 242;
-  --color-success-bg: 236 253 245;
-  --color-success-text: 6 95 70;
 }
 
 [data-theme="dark"] {
-  --color-bg: 15 23 42;
-  --color-surface: 30 41 59;
-  --color-border: 51 65 85;
+  --color-bg: 13 22 18; /* Deep slate forest */
+  --color-surface: 22 36 30;
+  --color-border: 38 60 50;
   --color-text: 241 245 249;
-  --color-text-muted: 148 163 184;
-  --color-accent: 96 165 250;
-  --color-accent-hover: 147 197 253;
-  --color-accent-soft: 30 58 95;
-  --color-danger: 248 113 113;
-  --color-danger-hover: 252 165 165;
-  --color-danger-soft: 69 10 10;
-  --color-success-bg: 6 78 59;
-  --color-success-text: 167 243 208;
+  --color-text-muted: 156 175 166;
 }
 
 @layer base {
@@ -45,46 +29,52 @@
 
   body {
     font-family: 'Poppins', sans-serif;
-    @apply bg-bg text-text antialiased transition-colors duration-150;
+    background-color: rgb(var(--color-bg));
+    color: rgb(var(--color-text));
+    @apply antialiased transition-colors duration-150;
   }
 
   h1 {
     font-family: 'Poppins', sans-serif;
-    @apply text-2xl sm:text-3xl font-bold tracking-tight text-text;
+    @apply text-xl sm:text-2xl font-bold tracking-tight text-text;
   }
 
   h2 {
     font-family: 'Poppins', sans-serif;
-    @apply text-xl sm:text-2xl font-bold tracking-tight text-text;
+    @apply text-lg sm:text-xl font-bold tracking-tight text-text;
   }
 
   h3 {
     font-family: 'Poppins', sans-serif;
-    @apply text-base font-semibold text-text;
+    @apply text-sm sm:text-base font-semibold text-text;
   }
 
   p {
     font-family: 'Poppins', sans-serif;
-    @apply text-sm leading-relaxed text-muted max-w-[80ch];
+    @apply text-xs sm:text-sm leading-relaxed text-muted;
   }
 }
 
 @layer components {
-  /* Institutional functional UI components */
+  /* Modern clean interactive buttons */
   .btn-primary {
-    @apply inline-flex min-h-[44px] items-center justify-center rounded border border-transparent bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 active:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-sans shadow-sm;
+    @apply inline-flex min-h-[42px] items-center justify-center rounded-xl border border-transparent bg-emerald-600 px-4 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-emerald-700 active:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 font-sans shadow-soft hover:shadow-soft-md;
   }
 
   .btn-secondary {
-    @apply inline-flex min-h-[44px] items-center justify-center rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 active:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500 disabled:opacity-50 transition-colors font-sans;
+    @apply inline-flex min-h-[42px] items-center justify-center rounded-xl border border-emerald-900/10 bg-white px-4 py-2 text-xs sm:text-sm font-medium text-slate-700 hover:bg-emerald-50/50 hover:text-emerald-950 active:bg-emerald-100/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 disabled:opacity-50 transition-all duration-150 font-sans shadow-soft hover:shadow-soft-md;
   }
 
   .input-field {
-    @apply w-full min-h-[44px] rounded border border-gray-300 bg-white px-3.5 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-emerald-600 focus:outline-none focus:ring-1 focus:ring-emerald-600 disabled:bg-gray-100 disabled:text-gray-500 transition-colors font-sans;
+    @apply w-full min-h-[42px] rounded-xl border border-emerald-900/15 bg-white px-3.5 py-2 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-1 focus:ring-emerald-600 disabled:bg-emerald-50/30 disabled:text-slate-500 transition-colors font-sans shadow-soft;
   }
 
   .label-text {
-    @apply block text-xs font-semibold text-muted mb-1.5 font-sans;
+    @apply block text-xs font-semibold text-slate-700 mb-1.5 font-sans;
+  }
+
+  .card-modern {
+    @apply bg-white border border-emerald-900/10 rounded-2xl p-5 sm:p-6 shadow-soft transition-all duration-200;
   }
 }
 
@@ -92,7 +82,7 @@
    REFINED BALANCED DARK MODE STYLES & CONTRAST
    ======================================================== */
 [data-theme="dark"] body {
-  background-color: #0b0f19 !important;
+  background-color: #0d1612 !important;
   color: #f1f5f9 !important;
 }
 
@@ -100,24 +90,29 @@
 [data-theme="dark"] header,
 [data-theme="dark"] footer,
 [data-theme="dark"] .bg-white {
-  background-color: #1e293b !important;
+  background-color: #16241e !important;
   color: #f1f5f9 !important;
 }
 
 [data-theme="dark"] .bg-gray-50,
 [data-theme="dark"] .bg-slate-50,
 [data-theme="dark"] .bg-gray-100,
+[data-theme="dark"] .bg-slate-100,
 [data-theme="dark"] .bg-gray-50\/50,
-[data-theme="dark"] .bg-slate-50\/50 {
-  background-color: #141e2e !important;
+[data-theme="dark"] .bg-slate-50\/50,
+[data-theme="dark"] .bg-emerald-50\/30,
+[data-theme="dark"] .bg-emerald-50\/50 {
+  background-color: #101c17 !important;
   color: #f1f5f9 !important;
 }
 
 [data-theme="dark"] .border-gray-200,
 [data-theme="dark"] .border-gray-300,
 [data-theme="dark"] .border-slate-200,
-[data-theme="dark"] .border-slate-300 {
-  border-color: #334155 !important;
+[data-theme="dark"] .border-slate-300,
+[data-theme="dark"] .border-emerald-900\/10,
+[data-theme="dark"] .border-emerald-900\/15 {
+  border-color: #273e33 !important;
 }
 
 [data-theme="dark"] .text-gray-900,
@@ -201,9 +196,9 @@
 [data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]),
 [data-theme="dark"] select,
 [data-theme="dark"] textarea {
-  background-color: #0f172a !important;
+  background-color: #101c17 !important;
   color: #f8fafc !important;
-  border-color: #334155 !important;
+  border-color: #273e33 !important;
 }
 
 [data-theme="dark"] .input-field::placeholder,
@@ -214,13 +209,13 @@
 
 /* Buttons */
 [data-theme="dark"] .btn-secondary {
-  background-color: #1e293b !important;
+  background-color: #16241e !important;
   color: #e2e8f0 !important;
-  border-color: #475569 !important;
+  border-color: #273e33 !important;
 }
 
 [data-theme="dark"] .btn-secondary:hover {
-  background-color: #334155 !important;
+  background-color: #22372e !important;
   color: #ffffff !important;
 }
 
@@ -239,15 +234,15 @@
 }
 
 [data-theme="dark"] thead th {
-  background-color: #141e2e !important;
+  background-color: #101c17 !important;
   color: #94a3b8 !important;
-  border-color: #334155 !important;
+  border-color: #273e33 !important;
 }
 
 [data-theme="dark"] tbody tr:hover {
-  background-color: #243248 !important;
+  background-color: #1d2f27 !important;
 }
 
 [data-theme="dark"] tbody td {
-  border-color: #334155 !important;
+  border-color: #273e33 !important;
 }

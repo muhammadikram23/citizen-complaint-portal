@@ -6,15 +6,15 @@ export const StatusBadge = ({ status }) => {
   const configs = {
     resolved: {
       label: 'Resolved',
-      classes: 'bg-emerald-50 text-emerald-800 border-emerald-300',
+      classes: 'bg-emerald-50 text-emerald-800 border-emerald-200',
     },
     'in progress': {
       label: 'In Progress',
-      classes: 'bg-blue-50 text-blue-800 border-blue-300',
+      classes: 'bg-blue-50 text-blue-800 border-blue-200',
     },
     pending: {
       label: 'Pending',
-      classes: 'bg-amber-50 text-amber-800 border-amber-300',
+      classes: 'bg-amber-50 text-amber-800 border-amber-200',
     },
   };
 
@@ -22,7 +22,7 @@ export const StatusBadge = ({ status }) => {
 
   return (
     <span
-      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border font-sans ${current.classes}`}
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium border font-sans shadow-xs ${current.classes}`}
     >
       {current.label}
     </span>

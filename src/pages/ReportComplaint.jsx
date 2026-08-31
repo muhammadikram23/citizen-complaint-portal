@@ -49,12 +49,10 @@ export const ReportComplaint = () => {
 
   // Duplicate Check effect: Checks title, description, category, and area
   useEffect(() => {
-    if (
-      !formData.title.trim() ||
-      !formData.category ||
-      !formData.area.trim() ||
-      formData.area.trim().length < 2
-    ) {
+    const hasEnoughText =
+      formData.title.trim().length >= 3 || formData.description.trim().length >= 8;
+
+    if (!hasEnoughText || duplicateCheckDismissed) {
       setDuplicates([]);
       return;
     }
@@ -62,54 +60,56 @@ export const ReportComplaint = () => {
     const timer = setTimeout(async () => {
       try {
         const res = await api.post('/complaints/check-duplicate', {
-          title: formData.title.trim(),
-          description: formData.description.trim(),
+          title: formData.title,
+          description: formData.description,
           category: formData.category,
-          area: formData.area.trim(),
+          area: formData.area,
         });
-        const matches = res.data.matches || [];
-        setDuplicates(matches);
-        setDuplicateCheckDismissed(false);
+        setDuplicates(res.data.duplicates || []);
       } catch (err) {
         console.error('Duplicate check error:', err);
       }
-    }, 500);
+    }, 450);
 
     return () => clearTimeout(timer);
-  }, [formData.title, formData.description, formData.category, formData.area]);
+  }, [formData, duplicateCheckDismissed]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setDuplicateCheckDismissed(false);
   };
 
   const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        setError('Image file exceeds the 5MB size limit.');
-        return;
-      }
-      setSelectedFile(file);
-      setFilePreview(URL.createObjectURL(file));
-      setError('');
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Check size limit: 5MB
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Selected image exceeds 5MB size limit.');
+      return;
     }
+
+    setSelectedFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFilePreview(reader.result);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleRemoveFile = () => {
     setSelectedFile(null);
-    if (filePreview) {
-      URL.revokeObjectURL(filePreview);
-      setFilePreview(null);
-    }
+    setFilePreview(null);
   };
 
   const handleUpvoteDuplicate = async (complaintId) => {
     try {
       await api.patch(`/complaints/${complaintId}/upvote`);
-      setSuccess('Existing complaint upvoted successfully. Thank you for helping prioritize this issue.');
+      setSuccess('Duplicate upvoted successfully. Navigating to the issue detail...');
       setTimeout(() => {
-        navigate('/complaints/mine');
-      }, 1500);
+        navigate(`/complaints/${complaintId}`);
+      }, 1200);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to upvote duplicate complaint.');
     }
@@ -120,32 +120,28 @@ export const ReportComplaint = () => {
     setError('');
     setSuccess('');
 
-    if (!formData.title || !formData.category || !formData.area || !formData.description) {
-      setError('Please fill in title, category, area, and description.');
+    if (!formData.title.trim() || !formData.description.trim() || !formData.area.trim()) {
+      setError('Please provide title, area, and description.');
       return;
     }
 
     setLoading(true);
-    try {
-      if (selectedFile) {
-        // Multipart FormData upload with Multer
-        const multipartData = new FormData();
-        multipartData.append('title', formData.title);
-        multipartData.append('category', formData.category);
-        multipartData.append('area', formData.area);
-        multipartData.append('description', formData.description);
-        multipartData.append('photo', selectedFile);
 
-        await api.post('/complaints', multipartData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-      } else {
-        // Standard JSON submission
-        await api.post('/complaints', {
-          ...formData,
-          imageUrl: imageUrlInput.trim(),
-        });
+    try {
+      let finalImageUrl = imageUrlInput.trim();
+
+      // If a file was selected, send base64 data URL
+      if (filePreview) {
+        finalImageUrl = filePreview;
       }
+
+      await api.post('/complaints', {
+        title: formData.title.trim(),
+        category: formData.category,
+        area: formData.area.trim(),
+        description: formData.description.trim(),
+        imageUrl: finalImageUrl,
+      });
 
       setSuccess('Complaint reported successfully. Assigned status: Pending review.');
       setTimeout(() => {
@@ -163,18 +159,20 @@ export const ReportComplaint = () => {
       <div>
         <Link
           to="/dashboard"
-          className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors mb-2"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors mb-3"
         >
           <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.75} />
           Back to dashboard
         </Link>
         <div className="flex items-center gap-4">
-          <img src={logo} alt="Municipal Logo" className="h-16 sm:h-20 w-auto object-contain shrink-0" />
+          <div className="p-2 rounded-2xl bg-white border border-emerald-900/10 shadow-soft shrink-0">
+            <img src={logo} alt="Municipal Logo" className="h-12 sm:h-14 w-auto object-contain shrink-0" />
+          </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-950 font-serif">
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-950">
               Report a complaint
             </h1>
-            <p className="text-xs text-gray-600 mt-0.5">
+            <p className="text-xs text-slate-600 mt-0.5">
               Submit details regarding municipal service breakdowns for field inspection and dispatch.
             </p>
           </div>
@@ -182,14 +180,14 @@ export const ReportComplaint = () => {
       </div>
 
       {error && (
-        <div className="p-3.5 rounded bg-red-50 border border-red-200 text-xs text-red-800 font-medium flex items-center gap-2">
+        <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-xs text-red-800 font-medium flex items-center gap-2.5 shadow-soft">
           <AlertCircle className="h-4 w-4 shrink-0 text-red-600" strokeWidth={1.75} />
           <span>{error}</span>
         </div>
       )}
 
       {success && (
-        <div className="p-3.5 rounded bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-medium flex items-center gap-2">
+        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-medium flex items-center gap-2.5 shadow-soft">
           <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" strokeWidth={1.75} />
           <span>{success}</span>
         </div>
@@ -197,12 +195,12 @@ export const ReportComplaint = () => {
 
       {/* Daily Submission Limit / Quota Banner */}
       <div
-        className={`p-4 rounded border text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+        className={`p-4 rounded-2xl border text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-soft ${
           dailyQuota.remaining === 0
             ? 'bg-red-50 border-red-300 text-red-950'
             : dailyQuota.remaining === 1
             ? 'bg-amber-50 border-amber-300 text-amber-950'
-            : 'bg-blue-50 border-blue-200 text-blue-950'
+            : 'bg-emerald-50/60 border-emerald-200/80 text-emerald-950'
         }`}
       >
         <div className="flex items-center gap-2.5">
@@ -212,7 +210,7 @@ export const ReportComplaint = () => {
                 ? 'text-red-700'
                 : dailyQuota.remaining === 1
                 ? 'text-amber-700'
-                : 'text-blue-700'
+                : 'text-emerald-700'
             }`}
             strokeWidth={1.75}
           />
@@ -237,10 +235,10 @@ export const ReportComplaint = () => {
         </div>
 
         <span
-          className={`font-semibold px-2.5 py-1 rounded text-xs border shrink-0 text-center ${
+          className={`font-semibold px-3 py-1 rounded-full text-xs border shrink-0 text-center ${
             dailyQuota.remaining === 0
               ? 'bg-red-100 text-red-900 border-red-300'
-              : 'bg-white text-slate-800 border-slate-300'
+              : 'bg-white text-emerald-900 border-emerald-300'
           }`}
         >
           {dailyQuota.remaining} / {dailyQuota.limit} remaining
@@ -256,8 +254,8 @@ export const ReportComplaint = () => {
         />
       )}
 
-      {/* Submission Form */}
-      <form onSubmit={handleSubmit} className="bg-white border border-slate-300 rounded p-6 sm:p-8 space-y-5 shadow-xs">
+      {/* Submission Form Card */}
+      <form onSubmit={handleSubmit} className="bg-white border border-emerald-900/10 rounded-2xl p-6 sm:p-8 space-y-5 shadow-soft">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="label-text">Category</label>
@@ -283,7 +281,7 @@ export const ReportComplaint = () => {
               name="area"
               value={formData.area}
               onChange={handleChange}
-              placeholder="e.g. Sector G-9"
+              placeholder="e.g. Sector G-9, Blue Area"
               className="input-field"
               required
             />
@@ -326,12 +324,12 @@ export const ReportComplaint = () => {
               <img
                 src={filePreview}
                 alt="Upload preview"
-                className="h-36 w-auto max-w-full rounded border border-slate-300 object-cover"
+                className="h-36 w-auto max-w-full rounded-xl border border-emerald-900/10 object-cover shadow-soft"
               />
               <button
                 type="button"
                 onClick={handleRemoveFile}
-                className="absolute -top-2 -right-2 bg-red-700 text-white p-1 rounded-full hover:bg-red-800 shadow-xs"
+                className="absolute -top-2 -right-2 bg-red-700 text-white p-1 rounded-full hover:bg-red-800 shadow-soft"
                 title="Remove photo"
               >
                 <X className="h-3.5 w-3.5" strokeWidth={1.75} />
@@ -342,8 +340,8 @@ export const ReportComplaint = () => {
             </div>
           ) : (
             <div className="mt-1 space-y-2">
-              <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 rounded p-4 hover:border-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
-                <Upload className="h-5 w-5 text-slate-500 mb-1" strokeWidth={1.75} />
+              <label className="flex flex-col items-center justify-center border-2 border-dashed border-emerald-900/20 rounded-2xl p-4 hover:border-emerald-600 cursor-pointer bg-emerald-50/20 hover:bg-emerald-50/50 transition-colors">
+                <Upload className="h-5 w-5 text-emerald-600 mb-1" strokeWidth={1.75} />
                 <span className="text-xs font-semibold text-slate-800">
                   Select image from device
                 </span>
@@ -358,7 +356,7 @@ export const ReportComplaint = () => {
                 />
               </label>
 
-              <div className="text-xs text-slate-400 text-center">
+              <div className="text-xs text-slate-400 text-center font-medium">
                 or provide an image URL:
               </div>
 
@@ -373,7 +371,7 @@ export const ReportComplaint = () => {
           )}
         </div>
 
-        <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
+        <div className="pt-4 border-t border-emerald-900/10 flex items-center justify-between">
           <Link to="/dashboard" className="btn-secondary text-xs">
             Cancel
           </Link>

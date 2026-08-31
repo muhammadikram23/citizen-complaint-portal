@@ -80,15 +80,17 @@ export const BrowseComplaints = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-4">
+      {/* Header with prominent Action Button */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-emerald-900/10 pb-5">
         <div className="flex items-center gap-4">
-          <img src={logo} alt="Municipal Logo" className="h-16 sm:h-20 w-auto object-contain shrink-0" />
+          <div className="p-2 rounded-2xl bg-white border border-emerald-900/10 shadow-soft shrink-0">
+            <img src={logo} alt="Municipal Logo" className="h-14 sm:h-16 w-auto object-contain shrink-0" />
+          </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-950 font-serif">
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-950">
               Public complaints registry
             </h1>
-            <p className="text-xs text-gray-600 mt-0.5">
+            <p className="text-xs text-slate-600 mt-0.5">
               Search active reports, review resolution timelines, and upvote issues in your area.
             </p>
           </div>
@@ -96,39 +98,39 @@ export const BrowseComplaints = () => {
 
         <Link
           to="/complaints/new"
-          className="btn-primary inline-flex items-center gap-2 self-start sm:self-auto text-xs"
+          className="btn-primary inline-flex items-center gap-2 self-start sm:self-auto text-xs sm:text-sm"
         >
-          <PlusCircle className="h-4 w-4" strokeWidth={1.75} />
+          <PlusCircle className="h-4 w-4" strokeWidth={2} />
           Report a complaint
         </Link>
       </div>
 
       {actionError && (
-        <div className="p-3 rounded bg-red-50 border border-red-200 text-xs text-red-800 font-medium flex items-center gap-2">
+        <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-xs text-red-800 font-medium flex items-center gap-2.5 shadow-soft">
           <AlertCircle className="h-4 w-4 shrink-0 text-red-600" strokeWidth={1.75} />
           <span>{actionError}</span>
         </div>
       )}
 
       {actionSuccess && (
-        <div className="p-3 rounded bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-medium flex items-center gap-2">
+        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-medium flex items-center gap-2.5 shadow-soft">
           <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" strokeWidth={1.75} />
           <span>{actionSuccess}</span>
         </div>
       )}
 
-      {/* Filter and Search Bar */}
-      <div className="bg-white border border-slate-300 rounded p-4 space-y-3">
+      {/* Filter and Search Bar Card */}
+      <div className="bg-white border border-emerald-900/10 rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-soft">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           {/* Keyword Search */}
           <div className="relative lg:col-span-2">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" strokeWidth={1.75} />
+            <Search className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" strokeWidth={1.75} />
             <input
               type="text"
               placeholder="Search title, description, or area..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="input-field pl-9 text-xs"
+              className="input-field pl-10 text-xs"
             />
           </div>
 
@@ -139,9 +141,9 @@ export const BrowseComplaints = () => {
               onChange={(e) => setCategory(e.target.value)}
               className="input-field text-xs"
             >
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  Category: {c}
+              {CATEGORIES.map((cat) => (
+                <option key={cat} value={cat}>
+                  Category: {cat}
                 </option>
               ))}
             </select>
@@ -154,15 +156,15 @@ export const BrowseComplaints = () => {
               onChange={(e) => setStatus(e.target.value)}
               className="input-field text-xs"
             >
-              {STATUSES.map((s) => (
-                <option key={s} value={s}>
-                  Status: {s}
+              {STATUSES.map((st) => (
+                <option key={st} value={st}>
+                  Status: {st}
                 </option>
               ))}
             </select>
           </div>
 
-          {/* Sort By Dropdown */}
+          {/* Sort Order */}
           <div>
             <select
               value={sortBy}
@@ -178,36 +180,36 @@ export const BrowseComplaints = () => {
         </div>
 
         {/* Priority Quick Filter Pills */}
-        <div className="pt-2 border-t border-slate-100 flex items-center gap-2 flex-wrap text-xs">
-          <span className="text-slate-500 mr-1">
+        <div className="pt-2 border-t border-emerald-900/10 flex items-center gap-2 flex-wrap text-xs">
+          <span className="text-slate-500 mr-1 font-medium">
             Priority tier:
           </span>
           {PRIORITIES.map((p) => (
             <button
               key={p}
               onClick={() => setPriority(p)}
-              className={`px-2.5 py-1 rounded text-xs transition-colors ${
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
                 priority === p
-                  ? 'bg-emerald-600 text-white font-semibold shadow-xs'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  ? 'bg-emerald-600 text-white font-semibold shadow-soft'
+                  : 'bg-emerald-50/50 text-slate-700 hover:bg-emerald-100/60 border border-emerald-900/10'
               }`}
             >
               {p}
             </button>
           ))}
-          <span className="ml-auto text-xs text-slate-500">
-            Showing {complaints.length} results
+          <span className="ml-auto text-xs text-slate-500 font-medium">
+            Showing {complaints.length} records
           </span>
         </div>
       </div>
 
       {/* Complaint Grid Feed */}
       {loading ? (
-        <div className="py-16 text-center text-xs text-slate-500">
+        <div className="py-16 text-center text-xs text-slate-500 bg-white border border-emerald-900/10 rounded-2xl shadow-soft">
           Loading civic complaint registry...
         </div>
       ) : complaints.length === 0 ? (
-        <div className="p-12 text-center bg-white border border-slate-300 rounded space-y-2">
+        <div className="p-12 text-center bg-white border border-emerald-900/10 rounded-2xl space-y-3 shadow-soft">
           <div className="text-sm font-semibold text-slate-900">No complaints found</div>
           <p className="text-xs text-slate-500 max-w-sm mx-auto">
             Try adjusting your search criteria or category filter to view other reports.
@@ -222,11 +224,11 @@ export const BrowseComplaints = () => {
             return (
               <div
                 key={item._id}
-                className="bg-white border border-slate-300 rounded p-4 flex flex-col justify-between hover:border-slate-400 transition-colors space-y-3"
+                className="bg-white border border-emerald-900/10 rounded-2xl p-5 flex flex-col justify-between hover:border-emerald-600/30 hover:shadow-soft-md transition-all space-y-3.5 shadow-soft"
               >
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs font-medium bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">
+                    <span className="text-[11px] font-medium bg-emerald-50 text-emerald-900 px-2.5 py-0.5 rounded-full border border-emerald-200/70">
                       {item.category}
                     </span>
                     <div className="flex items-center gap-1.5">
@@ -237,7 +239,7 @@ export const BrowseComplaints = () => {
 
                   {/* Photo Proof */}
                   {item.imageUrl && item.imageUrl.trim() !== '' && (
-                    <div className="relative h-40 w-full overflow-hidden rounded border border-slate-200 bg-slate-100">
+                    <div className="relative h-40 w-full overflow-hidden rounded-xl border border-emerald-900/10 bg-emerald-50/30">
                       <img
                         src={item.imageUrl}
                         alt={item.title}
@@ -252,7 +254,7 @@ export const BrowseComplaints = () => {
                   <div>
                     <Link
                       to={`/complaints/${item._id}`}
-                      className="font-bold text-slate-950 hover:underline text-sm leading-snug line-clamp-1 block"
+                      className="font-bold text-slate-950 hover:text-emerald-700 hover:underline text-sm leading-snug line-clamp-1 block"
                     >
                       {item.title}
                     </Link>
@@ -262,21 +264,21 @@ export const BrowseComplaints = () => {
                   </div>
 
                   {item.officerRemark && (
-                    <div className="bg-slate-50 border border-slate-200 p-2 rounded text-xs text-slate-700">
+                    <div className="bg-emerald-50/40 border border-emerald-900/10 p-2.5 rounded-xl text-xs text-slate-700">
                       <span className="font-semibold text-slate-900">Officer:</span> "{item.officerRemark}"
                     </div>
                   )}
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                <div className="pt-3 border-t border-emerald-900/10 flex items-center justify-between text-xs">
                   <div className="text-xs text-slate-500 truncate max-w-[130px]" title={item.area}>
-                    {item.area}
+                    Area: <strong className="text-slate-700 font-medium">{item.area}</strong>
                   </div>
 
                   <div className="flex items-center gap-2">
                     <Link
                       to={`/complaints/${item._id}`}
-                      className="btn-secondary text-xs min-h-[34px] py-1 px-2.5"
+                      className="btn-secondary text-xs min-h-[36px] py-1 px-3"
                     >
                       Details
                     </Link>
@@ -284,10 +286,10 @@ export const BrowseComplaints = () => {
                       type="button"
                       onClick={() => handleUpvote(item._id)}
                       disabled={hasUserUpvoted}
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium min-h-[34px] transition-colors border ${
+                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold min-h-[36px] transition-all border ${
                         hasUserUpvoted
                           ? 'bg-blue-50 text-blue-900 border-blue-200 cursor-default'
-                          : 'bg-slate-100 text-slate-800 hover:bg-emerald-600 hover:text-white hover:border-emerald-600 border-slate-300'
+                          : 'bg-emerald-50/50 text-slate-800 hover:bg-emerald-600 hover:text-white hover:border-emerald-600 border-emerald-900/10'
                       }`}
                       title={hasUserUpvoted ? 'You have already upvoted this complaint' : 'Upvote complaint'}
                     >

@@ -6,19 +6,19 @@ export const PriorityBadge = ({ priority, score }) => {
   const configs = {
     critical: {
       label: 'Critical',
-      classes: 'bg-red-50 text-red-800 border-red-300 font-semibold',
+      classes: 'bg-red-50 text-red-800 border-red-200 font-semibold',
     },
     high: {
       label: 'High',
-      classes: 'bg-orange-50 text-orange-800 border-orange-300 font-medium',
+      classes: 'bg-orange-50 text-orange-800 border-orange-200 font-medium',
     },
     medium: {
       label: 'Medium',
-      classes: 'bg-blue-50 text-blue-800 border-blue-300 font-medium',
+      classes: 'bg-blue-50 text-blue-800 border-blue-200 font-medium',
     },
     low: {
       label: 'Low',
-      classes: 'bg-gray-100 text-gray-700 border-gray-300',
+      classes: 'bg-emerald-50/50 text-slate-700 border-emerald-900/10 font-medium',
     },
   };
 
@@ -26,7 +26,7 @@ export const PriorityBadge = ({ priority, score }) => {
 
   return (
     <span
-      className={`inline-flex items-center px-2 py-0.5 rounded text-xs border font-sans ${current.classes}`}
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] border font-sans shadow-xs ${current.classes}`}
     >
       <span>{current.label}</span>
     </span>

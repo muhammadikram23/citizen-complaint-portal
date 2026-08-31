@@ -29,22 +29,22 @@ export const FeedbackModal = ({ complaint, isOpen, onClose, onSubmit }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/50">
-      <div className="bg-white border border-slate-300 rounded max-w-lg w-full p-6 shadow-md space-y-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-xs">
+      <div className="bg-white border border-emerald-900/10 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-soft-lg space-y-4">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+        <div className="flex items-center justify-between border-b border-emerald-900/10 pb-3">
           <div>
-            <h2 className="text-base font-bold text-slate-950">
+            <h2 className="text-base sm:text-lg font-bold text-slate-950">
               Rate complaint resolution
             </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5 font-medium">
               Ticket: {complaint.title}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-emerald-50 transition-colors"
             aria-label="Close modal"
           >
             <X className="h-5 w-5" strokeWidth={1.75} />
@@ -52,7 +52,7 @@ export const FeedbackModal = ({ complaint, isOpen, onClose, onSubmit }) => {
         </div>
 
         {error && (
-          <div className="p-3 rounded bg-red-50 border border-red-200 text-xs text-red-800">
+          <div className="p-3.5 rounded-2xl bg-red-50 border border-red-200 text-xs text-red-800 shadow-soft">
             {error}
           </div>
         )}
@@ -68,10 +68,10 @@ export const FeedbackModal = ({ complaint, isOpen, onClose, onSubmit }) => {
                   key={star}
                   type="button"
                   onClick={() => setRating(star)}
-                  className={`p-2 rounded border transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center ${
+                  className={`p-2 rounded-xl border transition-all min-h-[42px] min-w-[42px] flex items-center justify-center ${
                     rating >= star
-                      ? 'bg-amber-50 border-amber-300 text-amber-600'
-                      : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100'
+                      ? 'bg-amber-50 border-amber-300 text-amber-500 shadow-soft'
+                      : 'bg-emerald-50/30 border-emerald-900/10 text-slate-400 hover:bg-emerald-50'
                   }`}
                   aria-label={`Rate ${star} star`}
                 >
@@ -105,7 +105,7 @@ export const FeedbackModal = ({ complaint, isOpen, onClose, onSubmit }) => {
             />
           </div>
 
-          <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-3">
+          <div className="pt-3 border-t border-emerald-900/10 flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
