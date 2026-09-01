@@ -256,6 +256,27 @@ The client interfaces with the following backend REST API endpoints:
 
 ---
 
+## 🏆 Hackathon Recognition
+
+[#-hackathon-recognition](#-hackathon-recognition)
+
+This project was built end-to-end during **Quetta's First-Ever Coding Night** — a 12-hour overnight hackathon organized by **Saylani Mass IT (SMIT)**, bringing together the youth of Quetta, Balochistan under one roof to build working products from scratch in a single night.
+
+- 🥇 **Recognized as the Best Project in the MERN Stack Web Development category**
+- 🏅 **Ranked 2nd among the entries overall, out of 200+ competing candidates across all categories**
+- ⏱️ Designed, developed, and deployed within the **12-hour** event window
+
+---
+
+## 👤 Author
+
+[#-author](#-author)
+
+**Muhammad Ikram**
+GitHub: [@muhammadikram23](https://github.com/muhammadikram23)
+
+---
+
 ## 📄 License
 
 Distributed under the MIT License. See `LICENSE` for more information.
