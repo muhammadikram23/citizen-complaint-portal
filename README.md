@@ -256,6 +256,25 @@ The client interfaces with the following backend REST API endpoints:
 
 ---
 
+## Officer Login (Demo Credentials)
+
+For judging/demo purposes, the portal ships with a pre-seeded officer account. Logging in
+with these credentials is automatically detected as an **Officer** role and redirects to the
+Officer Dashboard (`/officer/dashboard`) instead of the citizen dashboard — no extra setup
+required.
+
+| Field    | Value               |
+|----------|---------------------|
+| Username | `officer@example.com` |
+| Password | `officier@123`       |
+
+**How it works:** the backend embeds the user's `role` (citizen/officer) in the JWT at login.
+The frontend reads that role from the token and routes accordingly — citizens land on
+`/dashboard`, officers land on `/officer/dashboard` — so no manual role selection is needed on
+the login screen itself.
+
+---
+
 ## 🏆 Hackathon Recognition
 
 [#-hackathon-recognition](#-hackathon-recognition)
