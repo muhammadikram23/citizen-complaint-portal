@@ -82,7 +82,7 @@ export const Sidebar = ({ children }) => {
       )}
 
       {/* Mobile Slide-in Drawer with Beautiful Rounded Corners */}
-      <div
+      <aside
         className={`md:hidden fixed inset-y-0 left-0 z-50 w-72 bg-white/95 backdrop-blur-md border-r border-emerald-900/10 rounded-r-3xl shadow-soft-lg transform transition-transform duration-200 ease-out flex flex-col ${
           mobileDrawerOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
@@ -215,7 +215,7 @@ export const Sidebar = ({ children }) => {
             </div>
           </div>
         </div>
-      </div>
+      </aside>
 
       {/* Desktop Fixed Side Navigation Rail with Rounded Aesthetic */}
       <aside
